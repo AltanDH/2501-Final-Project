@@ -35,13 +35,13 @@ namespace game {
             inline float GetRadius(void) const { return radius_; }
 
             // Getter to retrieve GameObject type (ex: "Player", "Collectible", "Enemy", etc..)
-            inline std::string GetType(void) const { return type_; }
+            inline const std::string& GetType(void) const { return type_; }
             
             // Getter to check if object has been destroyed
             inline bool isDestroyed(void) const { return is_destroyed_; }
 
             // Getter to be able to access object timer
-            inline Timer GetTimer(void) const { return timer_; }
+            inline Timer& GetTimer(void) { return timer_; }
 
             // Get bearing direction (direction in which the game object
             // is facing)
@@ -56,6 +56,9 @@ namespace game {
             inline void SetScale(glm::vec2 scale) { scale_ = scale; }
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
+
+            inline void SetHitpoints(int health) { hitpoints_ = health; }
+            inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }
 
             // Function to simulate collision
             virtual void Collide(GameObject* object);

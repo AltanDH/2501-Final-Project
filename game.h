@@ -8,6 +8,7 @@
 
 #include "shader.h"
 #include "game_object.h"
+#include "celestial_body.h"
 
 namespace game {
 
@@ -57,6 +58,9 @@ namespace game {
 
             // List of game objects
             std::vector<GameObject*> game_objects_;
+
+            // List of celestial bodies (planets)
+            std::vector<CelestialBody*> celestial_objects_;
 
             // Keep track of time
             double current_time_;

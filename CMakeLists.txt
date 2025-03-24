@@ -12,6 +12,8 @@ set(HDRS
     player_game_object.h
 	collectible_game_object.h
 	enemy_game_object.h
+	enemy_spawner.h
+	celestial_body.h
 	projectile.h
     shader.h
     geometry.h
@@ -27,6 +29,8 @@ set(SRCS
     player_game_object.cpp
 	collectible_game_object.cpp
 	enemy_game_object.cpp
+	enemy_spawner.cpp
+	celestial_body.cpp
 	projectile.cpp
     shader.cpp
     sprite.cpp

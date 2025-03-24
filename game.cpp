@@ -12,6 +12,7 @@
 #include "player_game_object.h"
 #include "collectible_game_object.h"
 #include "enemy_game_object.h"
+#include "enemy_spawner.h"
 #include "projectile.h"
 #include "game.h"
 
@@ -69,6 +70,24 @@ void Game::SetupGameWorld(void)
     game_objects_.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player_ship]));
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
+
+
+    // Spawn a Planet
+    // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
+    CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
+    planet->SetScale(4.0f);
+    celestial_objects_.push_back(planet);
+
+    // Spawn a second Planet
+    CelestialBody* planet2 = new CelestialBody(glm::vec3(-8.0f, 9.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
+    planet2->SetScale(4.0f);
+    celestial_objects_.push_back(planet2);
+
+    // Spawn a third Planet
+    CelestialBody* planet3 = new CelestialBody(glm::vec3(-2.0f, 16.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
+    planet3->SetScale(4.0f);
+    celestial_objects_.push_back(planet3);
+
     
     // Create a scale for the background texture coordinates enhancing
     float texture_coord_scale = 10.0f;
@@ -92,6 +111,10 @@ void Game::DestroyGameWorld(void)
     // Only need to delete objects that are not automatically freed
     for (int i = 0; i < game_objects_.size(); i++){
         delete game_objects_[i];
+    }
+
+    for (int i = 0; i < celestial_objects_.size(); i++) {
+        delete celestial_objects_[i];
     }
 }
 
@@ -128,12 +151,15 @@ void Game::HandleControls(double delta_time)
     if (glfwGetKey(window_, GLFW_KEY_E) == GLFW_PRESS) {
         player->SetVelocity(velocity + acceleration * player->GetRight());
     }
+
     // Rotate player as requested
     if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
         player->SetRotation(angle - angle_increment);
+        //player->SetVelocity(velocity * (dir + angle_increment));
     }
     if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
         player->SetRotation(angle + angle_increment);
+        //player->SetVelocity(velocity * (dir - angle_increment));
     }
     
     // Fire projectile if requested
@@ -224,7 +250,7 @@ void Game::Update(double delta_time)
                     current_game_object->Collide(other_game_object);
                     other_game_object->Collide(current_game_object);
                 }
-
+                
                 // Change object texture to explosions if destroyed (except for collectibles)
                 if (current_game_object->isDestroyed() && current_game_object->GetType() != "Collectible") {
                     current_game_object->SetTexture(tex_[5]);
@@ -235,8 +261,43 @@ void Game::Update(double delta_time)
             }
         }
     }
+
+    // Update all celestial objects
+    for (int i = 0; i < celestial_objects_.size(); i++) {
+        // Get the current celestial object
+        CelestialBody* celestial_object = celestial_objects_[i];
+
+        // Update the current celestial object
+        celestial_object->Update(delta_time);
+
+        // Check for collision with other game objects
+        for (int j = 0; j < (game_objects_.size() - 1); j++) {
+            GameObject* game_object = game_objects_[j];
+
+            // Don't waste time on already destroyed objects
+            if (!game_object->isDestroyed()) {
+                // Compute distance between both objects (to be used for circle-circle collision)
+                float distance = glm::distance(celestial_object->GetPosition(), game_object->GetPosition());
+                
+                // If distance is below a threshold, we have a collision (circle-circle method)
+                if (distance < (celestial_object->GetRadius() + game_object->GetRadius())) {
+                    // Trigger collision functions
+                    celestial_object->Collide(game_object);
+                    game_object->Collide(celestial_object);
+                }
+
+                // Change object texture to explosions if destroyed (except for collectibles)
+                if (game_object->isDestroyed() && game_object->GetType() != "Collectible") {
+                    game_object->SetTexture(tex_[5]);
+                }
+            }
+        }
+
+        // Apply Celestial object gravity to player
+        celestial_object->GravitationalAcceleration((PlayerGameObject*)game_objects_[0], delta_time);
+    }
     
-    // Clean up destroyed enemy objects
+    // Clean up destroyed objects
     for (int i = 0; i < game_objects_.size(); i++) {
         // Make sure correct conditions have been met
         if (game_objects_[i]->isDestroyed() && game_objects_[i]->GetTimer().Finished()) {
@@ -297,7 +358,7 @@ void Game::Render(void){
     }
 
     // Set view to zoom out, centered by default at 0,0
-    float camera_zoom = 0.25f;
+    float camera_zoom = 0.1f;
     glm::mat4 camera_zoom_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(camera_zoom, camera_zoom, camera_zoom));
 
     // Create the translation that allows the camera to follow the player object
@@ -305,6 +366,11 @@ void Game::Render(void){
     // Form the view_matrix that will follow the player
     glm::mat4 view_matrix = window_scale_matrix * camera_zoom_matrix * player_translation;
 
+    // Render all celestial objects
+    for (int i = 0; i < celestial_objects_.size(); i++) {
+        celestial_objects_[i]->Render(view_matrix, current_time_);
+    }
+    
     // Render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
         game_objects_[i]->Render(view_matrix, current_time_);

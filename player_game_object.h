@@ -30,6 +30,7 @@ namespace game {
 
             // Setters
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
+            inline void SetAcceleration(float acceleration) { acceleration_ = acceleration; }
 
         protected:
             // Values for implementing physics-based movement
