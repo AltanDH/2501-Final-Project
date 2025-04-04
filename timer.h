@@ -17,6 +17,9 @@ namespace game {
             // Check if timer has finished
             bool Finished(void) const;
 
+            // Get time remaining until end
+            double TimeLeft(void) const;
+
         private:
             // Store the starting time and ending time (in seconds)
             double start_time_;  
