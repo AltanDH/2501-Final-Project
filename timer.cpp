@@ -27,4 +27,8 @@ bool Timer::Finished(void) const {
     return glfwGetTime() >= end_time_;
 }
 
+double Timer::TimeLeft(void) const {
+    return end_time_ - start_time_;
+}
+
 } // namespace game

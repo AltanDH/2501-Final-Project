@@ -12,9 +12,12 @@ set(HDRS
     player_game_object.h
 	collectible_game_object.h
 	enemy_game_object.h
-	enemy_spawner.h
+	boomer_enemy.h
+	dreadnought_enemy.h
+	fighter_enemy.h
 	celestial_body.h
 	projectile.h
+	pulse.h
     shader.h
     geometry.h
     sprite.h
@@ -29,9 +32,12 @@ set(SRCS
     player_game_object.cpp
 	collectible_game_object.cpp
 	enemy_game_object.cpp
-	enemy_spawner.cpp
+	boomer_enemy.cpp
+	dreadnought_enemy.cpp
+	fighter_enemy.cpp
 	celestial_body.cpp
 	projectile.cpp
+	pulse.cpp
     shader.cpp
     sprite.cpp
     timer.cpp
