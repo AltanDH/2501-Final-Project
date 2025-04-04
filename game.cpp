@@ -131,11 +131,11 @@ void Game::HandleControls(double delta_time)
     // if translation or rotation is too slow
     float speed = delta_time*1000.0;
     float motion_increment = 0.0015*speed;
-    float angle_increment = (glm::pi<float>() / 1800.0f)*speed;
+    float angle_increment = (glm::pi<float>() / 1800.0f)*speed*2;
 
     // Get current velocity and acceleration
     glm::vec3 velocity = player->GetVelocity();
-    float acceleration = player->GetAcceleration();
+    float acceleration = player->GetAcceleration()*1.6;
 
     // Check for player input and make changes accordingly
     // Move player in desired direction
