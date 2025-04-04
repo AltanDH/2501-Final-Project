@@ -18,7 +18,7 @@ PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Sh
 	shooting_cooldown_ = Timer();
 	velocity_ = glm::vec3(0.005f, 0.005f, 0.0f);
 	acceleration_ = 0.003;
-	max_velocity_ = 10.0;
+	max_velocity_ = 8.0;
 }
 
 // Update function for moving the player object around
