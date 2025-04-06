@@ -31,23 +31,23 @@ namespace game {
 		shooting_cooldown_ = Timer();
 	}
 
-	// Function that fires projectile and returns its pointer, or nullptr if none were fired
-	Projectile* FighterEnemy::Fire() {
-		// If firing cooldown hasn't ended there is nothing to return (since nothing was fired)
+	// Function that fires projectile
+	void FighterEnemy::Fire() {
+		// If firing cooldown hasn't ended there is nothing to do (since nothing was fired)
 		if (!shooting_cooldown_.Finished()) {
-			return nullptr;
+			return;
 		}
 
 		// Create projectile to fire
-		Projectile* projectile = new Projectile(position_, geometry_, shader_, bullet_texture_, GetBearing());
+		Projectile* projectile = new Projectile(position_, geometry_, shader_, bullet_texture_, GetBearing(), this);
 		// Rotate it to face the direction the player is looking in
 		projectile->SetRotation(angle_);
 
 		// Reset shooting cooldown
 		shooting_cooldown_.Start(1.0f);
 
-		// Return resulting projectile pointer
-		return projectile;
+		// Adds resulting projectile pointer to game objects (for collision checks)
+		game_objects_ref_->insert(game_objects_ref_->end() - 1, projectile);
 	}
 
 	// Override update method for custom behavior

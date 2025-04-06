@@ -52,9 +52,25 @@ void GameObject::SetRotation(float angle){
     angle_ = angle;
 }
 
+void GameObject::SetHitpoints(int health) {
+    hitpoints_ = health;
+
+    // change state to 'destroyed' if necessary
+    if (hitpoints_ <= 0 && !is_destroyed_) {
+        is_destroyed_ = true;
+        // set timer for duration until object deletion
+        timer_.Start(5.0f);
+    }
+}
+
+// Doesn't do anything by default
+void GameObject::SetVelocity(const glm::vec3& velocity) {
+
+}
+
 void GameObject::Collide(GameObject* object) {
     // Don't allow collisions with collectibles by default
-    if (object->GetType() != "Collectible") {
+    if (object->GetType() != "Collectible" || object->GetType() != "Pulse" || object->GetType() != "Projectile") {
         // lower hitpoints
         hitpoints_--;
         // change state to 'destroyed' if necessary

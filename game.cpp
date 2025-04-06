@@ -10,9 +10,8 @@
 #include "sprite.h"
 #include "shader.h"
 #include "player_game_object.h"
+#include "mothership_boss.h"
 #include "collectible_game_object.h"
-#include "enemy_game_object.h"
-#include "enemy_spawner.h"
 #include "projectile.h"
 #include "game.h"
 
@@ -71,8 +70,15 @@ void Game::SetupGameWorld(void)
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
 
+    // Spawn Mothership (boss)
+    // Note that, in this specific implementation, the boss object will always be the second object in the game object vector
+    Mothership* mothership = new Mothership(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_, game_objects_[0]);
+    mothership->SetGameObjectsRef(&game_objects_);
+    mothership->LoadBarriers();
+    mothership->SetRotation(pi_over_two);
+    game_objects_.push_back(mothership);
 
-    // Spawn a Planet
+    /* Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
     CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet->SetScale(4.0f);
@@ -86,7 +92,7 @@ void Game::SetupGameWorld(void)
     // Spawn a third Planet
     CelestialBody* planet3 = new CelestialBody(glm::vec3(-2.0f, 16.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet3->SetScale(4.0f);
-    celestial_objects_.push_back(planet3);
+    celestial_objects_.push_back(planet3);*/
 
     
     // Create a scale for the background texture coordinates enhancing
@@ -188,15 +194,6 @@ void Game::Update(double delta_time)
     // Spawns Collectibles when necessary (with internal checks)
     SpawnCollectible();
 
-    // Check if enemy needs to be spawned
-    if (enemy_spawn_timer_.Finished()) {
-        // Spawn a new enemy
-        SpawnEnemy();
-
-        // Restart the timer to spawn the next enemy after 10 seconds
-        enemy_spawn_timer_.Start(10.0f);
-    }
-
     // Check player invincibility
     // note that as long as player alive, game_object_[0] is always the player
     if (game_objects_[0]->GetType() == "Player") {
@@ -232,13 +229,13 @@ void Game::Update(double delta_time)
                 float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
                 
                 // Check if Projectiles are involved (then Ray-Circle method necessary)
-                if (current_game_object->GetType() == "Projectile" && other_game_object->GetType() == "Enemy") {
+                if (current_game_object->GetType() == "Projectile") {
                     if (RayCircleCollision(current_game_object->GetPosition(), current_game_object->GetBearing(), other_game_object->GetPosition(), other_game_object->GetRadius(), ((Projectile*)current_game_object)->GetSpeed(), delta_time)) {
                         current_game_object->Collide(other_game_object);
                         other_game_object->Collide(current_game_object);
                     }
                 }
-                if (current_game_object->GetType() == "Enemy" && other_game_object->GetType() == "Projectile") {
+                if (other_game_object->GetType() == "Projectile") {
                     if (RayCircleCollision(other_game_object->GetPosition(), other_game_object->GetBearing(), current_game_object->GetPosition(), current_game_object->GetRadius(), ((Projectile*)other_game_object)->GetSpeed(), delta_time)) {
                         current_game_object->Collide(other_game_object);
                         other_game_object->Collide(current_game_object);
@@ -358,7 +355,11 @@ void Game::Render(void){
     }
 
     // Set view to zoom out, centered by default at 0,0
-    float camera_zoom = 0.1f;
+    float camera_zoom = 1.0f;
+    // Make camera zoom out procedurally during game beginning
+    if (current_time_ <= 9) {
+        camera_zoom = 1 - (current_time_ / 10);
+    }
     glm::mat4 camera_zoom_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(camera_zoom, camera_zoom, camera_zoom));
 
     // Create the translation that allows the camera to follow the player object
@@ -377,27 +378,14 @@ void Game::Render(void){
     }
 }
 
-void Game::SpawnEnemy() {
-    // create random spawn position
-    glm::vec3 spawn_position = glm::vec3(rand() % 8 - 4, rand() % 6 - 3, 0.0f);
 
-    // Create a new EnemyGameObject at the spawn position (and make it target the player)
-    // note tex[1] is already defined as enemy texture
-    EnemyGameObject* new_enemy = new EnemyGameObject(spawn_position, sprite_, &sprite_shader_, tex_[1], game_objects_[0]);
-    
-    // Set enemy rotation
-    float pi_over_two = glm::pi<float>() / 2.0f;
-    new_enemy->SetRotation(pi_over_two);
-
-    // Add the new enemy to the game objects list (note we insert it such that it gets added right before the background to avoid collision detection mismatch)
-    game_objects_.insert(game_objects_.end() - 1, new_enemy);
-}
-
-void Game::SpawnCollectible() {
+void Game::SpawnCollectible(void) {
     // Check if it's time to spawn a collectible
     if (collectible_spawn_timer_.Finished()) {
         // Generate random spawn position
-        glm::vec3 spawn_position = glm::vec3(rand() % 8 - 4, rand() % 6 - 3, 0.0f);
+        glm::vec3 spawn_position = glm::vec3(0.0f, 0.0f, 0.0f);
+        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 9 - 4;
+        spawn_position.y = game_objects_[1]->GetPosition().y + rand() % 9;
 
         // Create a new collectible game object at the spawn position
         // note that tex[6] already defined as corresponding collectible texture
@@ -410,7 +398,7 @@ void Game::SpawnCollectible() {
         // Add the new collectible to game objects list (note we insert it such that it gets added right before the background to avoid collision detection mismatch)
         game_objects_.insert(game_objects_.end() - 1, new_collectible);
 
-        collectible_spawn_timer_.Start(3.5f);
+        collectible_spawn_timer_.Start(rand() % 4 + 3);
     }
 }
 
@@ -520,10 +508,6 @@ void Game::Init(void)
 
     // Initialize time
     current_time_ = 0.0;
-
-    // Initialize timer to spawn enemies
-    enemy_spawn_timer_ = Timer();
-    enemy_spawn_timer_.Start(10.0f);
 
     // Initialize timer to spawn collectibles
     collectible_spawn_timer_ = Timer();

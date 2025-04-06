@@ -10,7 +10,7 @@ namespace game {
 
     public:
         // Constructor
-        Pulse(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture);
+        Pulse(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* owner);
 
         // Update function for moving the expanding pulse
         void Update(double delta_time) override;
@@ -24,6 +24,9 @@ namespace game {
 
         // Timer for pulse lifespan
         Timer lifespan_;
+
+        // Value to track entity that fired pulse (to avoid colliding with itself)
+        GameObject* owner_;
 
     }; // class Pulse
 

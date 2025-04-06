@@ -14,6 +14,9 @@ namespace game {
 			// Overrided function inherited from GameObject for custom reaction to collisions
 			void Collide(GameObject* object) override;
 
+			// Overrided update function for custom behavior
+			void Update(double delta_time) override;
+
 	}; // class CollectibleGameObject
 
 } // namespace game

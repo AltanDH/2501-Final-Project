@@ -9,7 +9,7 @@ namespace game {
     class Projectile : public GameObject {
 
     public:
-        Projectile(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, const glm::vec3& direction);
+        Projectile(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, const glm::vec3& direction, GameObject* owner);
 
         // Getters
         inline float GetSpeed(void) const { return speed_; }
@@ -27,6 +27,9 @@ namespace game {
 
         // timer for projectile lifespan
         Timer lifespan_;
+
+        // Value to track entity that fired pulse (to avoid colliding with itself)
+        GameObject* owner_;
 
     }; // class Projectile
 

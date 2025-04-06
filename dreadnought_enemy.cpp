@@ -21,21 +21,21 @@ namespace game {
 		shooting_cooldown_ = Timer();
 	}
 
-	// Function that fires pulse and returns its pointer, or nullptr if none were fired
-	Pulse* DreadnoughtEnemy::Fire() {
-		// If firing cooldown hasn't ended there is nothing to return (since nothing was fired)
+	// Function that fires pulse
+	void DreadnoughtEnemy::Fire() {
+		// If firing cooldown hasn't ended there is nothing to do (since nothing was fired)
 		if (!shooting_cooldown_.Finished()) {
-			return nullptr;
+			return;
 		}
 
 		// Create pulse to fire
-		Pulse* pulse = new Pulse(position_, geometry_, shader_, pulse_texture_);
+		Pulse* pulse = new Pulse(position_, geometry_, shader_, pulse_texture_, this);
 
 		// Reset shooting cooldown
 		shooting_cooldown_.Start(1.0f);
 
-		// Return resulting pulse pointer
-		return pulse;
+		// Adds resulting pulse pointer to game objects (for collision checks)
+		game_objects_ref_->insert(game_objects_ref_->end() - 1, pulse);
 	}
 
 	// Override update method for custom behavior

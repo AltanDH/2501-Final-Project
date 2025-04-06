@@ -80,7 +80,7 @@ Projectile* PlayerGameObject::Fire(GLuint texture) {
 	}
 
 	// Create projectile to fire
-	Projectile* projectile = new Projectile(position_, geometry_, shader_, texture, GetBearing());
+	Projectile* projectile = new Projectile(position_, geometry_, shader_, texture, GetBearing(), this);
 	// Rotate it to face the direction the player is looking in
 	projectile->SetRotation(angle_);
 

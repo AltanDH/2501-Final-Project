@@ -30,9 +30,6 @@ namespace game {
             // Destroy the game world
             void DestroyGameWorld(void);
 
-            // Spawn an Enemy
-            void SpawnEnemy(void);
-
             // Spawn a Collectible
             void SpawnCollectible(void);
 
@@ -64,9 +61,6 @@ namespace game {
 
             // Keep track of time
             double current_time_;
-
-            // Timer to spawn enemies regularly
-            Timer enemy_spawn_timer_;
 
             // Timer to spawn collectibles regularly
             Timer collectible_spawn_timer_;

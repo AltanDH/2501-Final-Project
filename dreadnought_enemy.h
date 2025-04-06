@@ -18,7 +18,7 @@ namespace game {
 			DreadnoughtEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint pulse_tex, GameObject* mothership = nullptr);
 
 			// Function that fires projectile and returns its pointer, or nullptr if none were fired
-			Pulse* Fire();
+			void Fire();
 
 			// Override update method for custom behavior
 			void Update(double delta_time) override;

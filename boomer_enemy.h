@@ -13,6 +13,9 @@ namespace game {
 			// Constructor
 			BoomerEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* target, GameObject* mothership = nullptr);
 
+			// Override inherited function from EnemyGameObject <- GameObject
+			inline void SetVelocity(const glm::vec3& velocity) override { direction_ = velocity; }
+
 			// Override update method for custom behavior
 			void Update(double delta_time) override;
 

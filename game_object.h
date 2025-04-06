@@ -33,6 +33,7 @@ namespace game {
             inline glm::vec2 GetScale(void) const { return scale_; }
             inline float GetRotation(void) const { return angle_; }
             inline float GetRadius(void) const { return radius_; }
+            inline int GetHitpoints(void) const { return hitpoints_; }
 
             // Getter to retrieve GameObject type (ex: "Player", "Collectible", "Enemy", etc..)
             inline const std::string& GetType(void) const { return type_; }
@@ -57,8 +58,11 @@ namespace game {
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
 
-            inline void SetHitpoints(int health) { hitpoints_ = health; }
+            void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }
+
+            // Placeholder function only meant for use in inheritance
+            virtual void SetVelocity(const glm::vec3& velocity);
 
             // Function to simulate collision
             virtual void Collide(GameObject* object);

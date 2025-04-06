@@ -12,6 +12,9 @@ namespace game {
 		// Default enemy info
 		type_ = "Enemy";
 		mothership_ = mothership;
+
+		// Set to null by default since we get the pointer from "game.cpp" after class creation
+		game_objects_ref_ = nullptr;
 	}
 
 } // namespace game
