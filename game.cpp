@@ -40,24 +40,34 @@ void Game::SetupGameWorld(void)
     //
     // Declare all the textures here
     std::vector<std::string> textures;
-    enum { tex_player_ship = 0,
-           tex_enemy_ship_1 = 1,
-           tex_enemy_ship_2 = 2,
-           tex_stars = 3,
-           tex_orb = 4,
-           explosion = 5,
-           tex_collectible = 6,
-           invincible = 7,
-           projectile = 8};
-    textures.push_back("/textures/player.png"); 
-    textures.push_back("/textures/enemy.png"); 
-    textures.push_back("/textures/enemy.png");
+    enum { tex_player = 0,
+           tex_invincible = 1,
+           tex_mothership = 2,
+           tex_barrier = 3,
+           tex_boomer = 4,
+           tex_dreadnought = 5,
+           tex_fighter = 6,
+           tex_explosion = 7,
+           tex_projectile_player = 8,
+           tex_projectile_enemy = 9,
+           tex_pulse = 10,
+           tex_collectible = 11,
+           tex_stars = 12,
+           tex_orb = 13};
+    textures.push_back("/textures/player.png");
+    textures.push_back("/textures/invincible.png");
+    textures.push_back("/textures/mothership.png");
+    textures.push_back("/textures/barrier.png");
+    textures.push_back("/textures/boomer.png");
+    textures.push_back("/textures/dreadnought.png");
+    textures.push_back("/textures/fighter.png");
+    textures.push_back("/textures/explosion.png");
+    textures.push_back("/textures/projectile_player.png");
+    textures.push_back("/textures/projectile_enemy.png");
+    textures.push_back("/textures/pulse.png");
+    textures.push_back("/textures/Powerups/collectible.png");
     textures.push_back("/textures/stars.png");
     textures.push_back("/textures/orb.png");
-    textures.push_back("/textures/explosion.png");
-    textures.push_back("/textures/collectible.png");
-    textures.push_back("/textures/invincible.png");
-    textures.push_back("/textures/bullet.png");
     // Load textures
     LoadTextures(textures);
 
@@ -66,7 +76,7 @@ void Game::SetupGameWorld(void)
 
     // Setup the player object (position, texture, vertex count)
     // Note that, in this specific implementation, the player object should always be the first object in the game object vector 
-    game_objects_.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player_ship]));
+    game_objects_.push_back(new PlayerGameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player]));
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
 
@@ -199,12 +209,12 @@ void Game::Update(double delta_time)
     if (game_objects_[0]->GetType() == "Player") {
         // Check if player is invincible (thus requires changing texture)
         if (((PlayerGameObject*)game_objects_[0])->isInvincible()) {
-            // note tex_[7] is already defined to be the invincible player texture
-            game_objects_[0]->SetTexture(tex_[7]);
+            // note tex_[3] is already defined to be the invincible player texture
+            game_objects_[0]->SetTexture(tex_[1]);
         }
         // and vice-versa if not invincible (also make sure player not destroyed to avoid resetting texture)
         else if (!game_objects_[0]->isDestroyed()) {
-            // note tex_[0] is already defined to be the normal player texture
+            // note tex_[2] is already defined to be the normal player texture
             game_objects_[0]->SetTexture(tex_[0]);
         }
     }
@@ -250,10 +260,10 @@ void Game::Update(double delta_time)
                 
                 // Change object texture to explosions if destroyed (except for collectibles)
                 if (current_game_object->isDestroyed() && current_game_object->GetType() != "Collectible") {
-                    current_game_object->SetTexture(tex_[5]);
+                    current_game_object->SetTexture(tex_[7]);
                 }
                 if (other_game_object->isDestroyed() && other_game_object->GetType() != "Collectible") {
-                    other_game_object->SetTexture(tex_[5]);
+                    other_game_object->SetTexture(tex_[7]);
                 }
             }
         }
@@ -285,7 +295,7 @@ void Game::Update(double delta_time)
 
                 // Change object texture to explosions if destroyed (except for collectibles)
                 if (game_object->isDestroyed() && game_object->GetType() != "Collectible") {
-                    game_object->SetTexture(tex_[5]);
+                    game_object->SetTexture(tex_[7]);
                 }
             }
         }
@@ -355,10 +365,14 @@ void Game::Render(void){
     }
 
     // Set view to zoom out, centered by default at 0,0
-    float camera_zoom = 1.0f;
+    float camera_zoom;
     // Make camera zoom out procedurally during game beginning
-    if (current_time_ <= 9) {
-        camera_zoom = 1 - (current_time_ / 10);
+    if (glfwGetTime() < 4) {
+        camera_zoom = 0.6f - (glfwGetTime() / 8.0f);
+    }
+    // Then stabilize it
+    else {
+        camera_zoom = 0.6f - (4.0f / 8.0f);  // 0.1
     }
     glm::mat4 camera_zoom_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(camera_zoom, camera_zoom, camera_zoom));
 
@@ -388,17 +402,13 @@ void Game::SpawnCollectible(void) {
         spawn_position.y = game_objects_[1]->GetPosition().y + rand() % 9;
 
         // Create a new collectible game object at the spawn position
-        // note that tex[6] already defined as corresponding collectible texture
-        CollectibleGameObject* new_collectible = new CollectibleGameObject(spawn_position, sprite_, &sprite_shader_, tex_[6]);
-
-        // Set collectible rotation to face upwards
-        float pi_over_two = glm::pi<float>() / 2.0f;
-        new_collectible->SetRotation(pi_over_two);
+        // note that tex[11] already defined as corresponding collectible texture
+        CollectibleGameObject* new_collectible = new CollectibleGameObject(spawn_position, sprite_, &sprite_shader_, tex_[11]);
 
         // Add the new collectible to game objects list (note we insert it such that it gets added right before the background to avoid collision detection mismatch)
         game_objects_.insert(game_objects_.end() - 1, new_collectible);
 
-        collectible_spawn_timer_.Start(rand() % 4 + 3);
+        collectible_spawn_timer_.Start(rand() % 8 + 7);
     }
 }
 
@@ -511,7 +521,7 @@ void Game::Init(void)
 
     // Initialize timer to spawn collectibles
     collectible_spawn_timer_ = Timer();
-    collectible_spawn_timer_.Start(3.5f);
+    collectible_spawn_timer_.Start(10.0f);
 }
 
 

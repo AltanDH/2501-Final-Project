@@ -100,3 +100,92 @@ Added a 'ghost' property to the fragment shader "sprite_fragment_shader.glsl".
 Modified 'Render' method in "game_object.cpp" to pass 'ghost_' attribute into fragment shader as integer variable.
 
 Modified 'main' function in fragment shader "sprite_fragment_shader.glsl" to color in grayscale when necessary.
+
+--------------
+--- Assets ---
+--------------
+
+All files in "/Projectiles/*" folder
+Source: https://gisha.itch.io/2d-space-game-pack
+License: Creative Commons CC0: "No right reserved". Attribution is not required, but highly appreciated.
+Creator: gishadev
+
+All files in "/Powerups/*" folder
+Source: https://gisha.itch.io/2d-space-game-pack
+License: Creative Commons CC0: "No right reserved". Attribution is not required, but highly appreciated.
+Creator: gishadev
+
+"beams.png"
+Source:  https://opengameart.org/content/lasers-and-beams
+License: This work is released to the Public Domain / CC0 license.
+Creator: Rawdanitsu
+
+"stars.png"
+Source:  https://opengameart.org/content/stars-parallax-backgrounds
+License: This work is released to the Public Domain / CC0 license.
+Creator: Bonsaiheldin
+
+"stars2.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki
+
+"explosion.png"
+Source:  https://opengameart.org/content/pixel-explosion-12-frames
+License: CC BY 3.0 license.
+Creator: JROB774
+
+"projectile_player.png"
+Source: https://gisha.itch.io/2d-space-game-pack
+License: Creative Commons CC0: "No right reserved". Attribution is not required, but highly appreciated.
+Creator: gishadev
+
+"projectile_enemy.png"
+Source: https://gisha.itch.io/2d-space-game-pack
+License: Creative Commons CC0: "No right reserved". Attribution is not required, but highly appreciated.
+Creator: gishadev
+
+"pulse.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki
+
+"pulse2.png"
+Source:  https://opengameart.org/content/lasers-and-beams
+License: This work is released to the Public Domain / CC0 license.
+Creator: Rawdanitsu
+
+"barrier.png"
+Source:  https://opengameart.org/content/laser-gate
+License: This work is released to the Public Domain / CC0 license.
+Creator: Fleurman
+
+"mothership.png"
+Source:  https://guardian5.itch.io/spaceship-asset
+License: Author specified "This assets is for personal and commercial use. The asset can be edited. This asset cannot be resold or distributed."
+Creator: Guardian
+
+"player.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki
+
+"invincible.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki (note that we slightly modified the color scheme)
+
+"dreadnought.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki
+
+"boomer.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki
+
+"fighter.png"
+Source:  https://zintoki.itch.io/space-breaker
+License: CC0 1.0 license.
+Creator: zintoki

@@ -1,9 +1,11 @@
+
 #include "dreadnought_enemy.h"
+#include "mothership_boss.h"
 
 namespace game {
 	
 	// Constructor
-	DreadnoughtEnemy::DreadnoughtEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint pulse_tex, GameObject* mothership)
+	DreadnoughtEnemy::DreadnoughtEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint pulse_tex, Mothership* mothership)
 		: EnemyGameObject(position, geom, shader, texture, mothership) {
 		
 		// Characteristics of ellipse

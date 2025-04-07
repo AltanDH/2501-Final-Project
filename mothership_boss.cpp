@@ -2,27 +2,28 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "mothership_boss.h"
+#include <iostream>
 
 namespace game {
 
 	// Constructor
 	Mothership::Mothership(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint* textures, GameObject* player)
-		: EnemyGameObject(position, geom, shader, textures[1]) {
+		: EnemyGameObject(position, geom, shader, textures[2]) {
 
 		// Mothership specifics
 		type_ = "Mothership";
 		hitpoints_ = 30;
 
 		// Variables to define boss zone
-		width_ = 10;
-		height_ = 10;
+		width_ = 18;
+		height_ = 18;
 		player_ = player;
 
 		position_.x = player_->GetPosition().x;
-		position_.y = player_->GetPosition().y - height_/2;
+		position_.y = player_->GetPosition().y + height_/2;
 
 		// Trackers for mothership movement
-		direction_ = glm::vec3(0.0f, -1.0f, 0.0f);
+		direction_ = glm::vec3(0.0f, 0.8f, 0.0f);
 		speed_ = 0.1f;
 
 		// References to textures
@@ -30,6 +31,7 @@ namespace game {
 
 		// Timer for shifting directions
 		shift_cooldown_ = Timer();
+		shift_cooldown_.Start(10.0f);
 
 		// Initialize timer to spawn enemies
 		enemy_spawn_timer_ = Timer();
@@ -46,37 +48,40 @@ namespace game {
 		int min_y = position_.y;
 		float pi_over_two = glm::pi<float>() / 2.0f;
 
+		std::cout << "Min x: " << min_x << std::endl;
+		std::cout << "Min y: " << min_y << std::endl;
+
 		// Setup barriers on Top Layer (left side of Boss)
 		for (int i = position_.x - width_ / 2; i < position_.x; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y + 3, 0.0f), geometry_, shader_, tex_[9]);
-			game_objects_ref_->insert(game_objects_ref_->end() - 1, barrier);
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2, 0.0f), geometry_, shader_, tex_[3], this);
+			game_objects_ref_->push_back(barrier);
 		}
 		// Setup barriers on Top Layer (right side of Boss)
-		for (int i = position_.x + 3; i < position_.x + 3 + width_/2; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y + 3, 0.0f), geometry_, shader_, tex_[9]);
-			game_objects_ref_->insert(game_objects_ref_->end() - 1, barrier);
+		for (int i = position_.x + 2; i < position_.x + 3 + width_/2; i++) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2, 0.0f), geometry_, shader_, tex_[3], this);
+			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Left Side (Top to Bottom)
-		for (int i = min_y + 3; i < position_.y + 3 + height_; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x, i, 0.0f), geometry_, shader_, tex_[9]);
+		for (int i = min_y - 2; i < position_.y - 3 - height_; i--) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x, i, 0.0f), geometry_, shader_, tex_[3], this);
 			// Set barrier rotation
 			barrier->SetRotation(pi_over_two);
-			game_objects_ref_->insert(game_objects_ref_->end() - 1, barrier);
+			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Right Side (Top to Bottom)
-		for (int i = min_y + 3; i < position_.y + 3 + height_; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x + 3 + width_, i, 0.0f), geometry_, shader_, tex_[9]);
+		for (int i = min_y - 2; i < position_.y - 2 - height_; i--) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x + 2 + width_, i, 0.0f), geometry_, shader_, tex_[3], this);
 			// Set barrier rotation
-			barrier->SetRotation(pi_over_two);
-			game_objects_ref_->insert(game_objects_ref_->end() - 1, barrier);
+			barrier->SetRotation(-pi_over_two);
+			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Bottom Layer
 		for (int i = min_x; i < min_x + width_; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y + 3 + height_, 0.0f), geometry_, shader_, tex_[9]);
-			game_objects_ref_->insert(game_objects_ref_->end() - 1, barrier);
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2 - height_, 0.0f), geometry_, shader_, tex_[3], this);
+			game_objects_ref_->push_back(barrier);
 		}
 	}
 
@@ -93,13 +98,13 @@ namespace game {
 		EnemyGameObject* new_enemy;
 
 		if (rand_choice == 0) {
-			new_enemy = new BoomerEnemy(spawn_pos, geometry_, shader_, tex_[1], player_, this);
+			new_enemy = new BoomerEnemy(spawn_pos, geometry_, shader_, tex_[4], player_, this);
 		}
 		else if (rand_choice == 1) {
-			new_enemy = new DreadnoughtEnemy(spawn_pos, geometry_, shader_, tex_[1], tex_[8], this);
+			new_enemy = new DreadnoughtEnemy(spawn_pos, geometry_, shader_, tex_[5], tex_[10], this);
 		}
 		else {
-			new_enemy = new FighterEnemy(spawn_pos, geometry_, shader_, tex_[1], tex_[8], (PlayerGameObject*)player_, this);
+			new_enemy = new FighterEnemy(spawn_pos, geometry_, shader_, tex_[6], tex_[9], (PlayerGameObject*)player_, this);
 		}
 
 		// Set enemy rotation

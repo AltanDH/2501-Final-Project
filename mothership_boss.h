@@ -23,6 +23,10 @@ namespace game {
 			// Constructor
 			Mothership(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint* textures, GameObject* player);
 
+			// Getters
+			inline const glm::vec3& GetDirection(void) const { return direction_; }
+			inline float GetSpeed(void) const { return speed_; }
+
 			// Loads in the barriers for the boss area
 			void LoadBarriers(void);
 
@@ -46,9 +50,6 @@ namespace game {
 
 			// Mothership speed
 			float speed_;
-
-			// List of barrier objects for boss zone
-			// std::vector<BossBarrier*> barriers_;
 
 			// Values to track enemy spawning regularly
 			Timer enemy_spawn_timer_;

@@ -2,18 +2,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "boomer_enemy.h"
+#include "mothership_boss.h"
 
 namespace game {
 
 	// Constructor
-	BoomerEnemy::BoomerEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* target, GameObject* mothership)
+	BoomerEnemy::BoomerEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* target, Mothership* mothership)
 		: EnemyGameObject(position, geom, shader, texture, mothership) {
 		
 		// Trackers for target pursuit
 		target_ = target;
 		direction_ = target->GetPosition() - position;
 		recalibration_interval_ = Timer();
-		speed_ = 0.2f;
+		speed_ = 0.5f;
 	}
 
 	// Override update method for custom movement behavior

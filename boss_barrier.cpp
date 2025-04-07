@@ -1,13 +1,15 @@
 
 #include "boss_barrier.h"
+#include "mothership_boss.h"
 
 namespace game {
 
 	// Constructor
-	BossBarrier::BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture)
+	BossBarrier::BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership)
 		: GameObject(position, geom, shader, texture) {
 
 		type_ = "Barrier";
+		mothership_ = mothership;
 	}
 
 	// Override collide for custom behavior
@@ -31,4 +33,14 @@ namespace game {
 			}
 		}
 	}
-}
+
+	// Override Update method for custom behavior
+	void BossBarrier::Update(double delta_time) {
+		
+		// Calculate resulting velocity from Mothership
+		glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+		// Apply it to the current position so Barriers keep following mothership
+		position_ += velocity * (float)delta_time;
+	}
+
+} // namespace game

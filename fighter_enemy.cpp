@@ -2,12 +2,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "fighter_enemy.h"
+#include "mothership_boss.h"
 
 namespace game {
 
 	// Constructor
-	FighterEnemy::FighterEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint bullet_tex, PlayerGameObject* target, GameObject* mothership)
-		: EnemyGameObject(position, geom, shader, texture) {
+	FighterEnemy::FighterEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint bullet_tex, PlayerGameObject* target, Mothership* mothership)
+		: EnemyGameObject(position, geom, shader, texture, mothership) {
 		
 		// Fighter default state
 		state_ = "wandering";

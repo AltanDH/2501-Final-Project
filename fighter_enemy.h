@@ -8,6 +8,11 @@
 #include "player_game_object.h"
 #include "projectile.h"
 
+// Forward declare Mothership class (needed because of circular includes problems if not done)
+namespace game {
+	class Mothership;
+}
+
 namespace game {
 
 	/*
@@ -18,7 +23,7 @@ namespace game {
 		
 		public:
 			// Constructor
-			FighterEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint bullet_tex, PlayerGameObject* target, GameObject* mothership = nullptr);
+			FighterEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GLuint bullet_tex, PlayerGameObject* target, Mothership* mothership = nullptr);
 
 			// Function that fires projectile and returns its pointer, or nullptr if none were fired
 			void Fire();
