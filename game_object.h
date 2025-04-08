@@ -22,24 +22,21 @@ namespace game {
             // Constructor
             GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader, GLuint texture, float scaleX = 1.0f, float scaleY = 1.0f);
 
-            // Update the GameObject's state. Can be overriden in children
-            virtual void Update(double delta_time);
-
-            // Renders the GameObject 
-            virtual void Render(glm::mat4 view_matrix, double current_time);
-
             // Getters
             inline glm::vec3 GetPosition(void) const { return position_; }
             inline glm::vec2 GetScale(void) const { return scale_; }
             inline float GetRotation(void) const { return angle_; }
             inline float GetRadius(void) const { return radius_; }
             inline int GetHitpoints(void) const { return hitpoints_; }
+            inline Timer& GetDmgCooldown(void) { return dmg_cooldown_; }
 
             // Getter to retrieve GameObject type (ex: "Player", "Collectible", "Enemy", etc..)
             inline const std::string& GetType(void) const { return type_; }
             
             // Getter to check if object has been destroyed
             inline bool isDestroyed(void) const { return is_destroyed_; }
+            // Getter for invincibility state
+            inline bool isInvincible(void) const { return is_invincible_; }
 
             // Getter to be able to access object timer
             inline Timer& GetTimer(void) { return timer_; }
@@ -58,17 +55,21 @@ namespace game {
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
 
-            inline void SetInvincible(bool b) { invincible_ = b;  }
-            inline bool GetInvincible(void) const { return invincible_; }
-
             void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }
+            inline void SetInvincible(bool invincible) { is_invincible_ = invincible; }
 
             // Placeholder function only meant for use in inheritance
             virtual void SetVelocity(const glm::vec3& velocity);
 
             // Function to simulate collision
-            virtual void Collide(GameObject* object);
+            virtual void Collide(GameObject* other);
+
+            // Update the GameObject's state. Can be overriden in children
+            virtual void Update(double delta_time);
+
+            // Renders the GameObject 
+            virtual void Render(glm::mat4 view_matrix, double current_time);
 
 
         protected:
@@ -87,6 +88,12 @@ namespace game {
             // Property to trigger grayscale
             bool ghost_;
 
+            // Boolean to track invincibility state
+            bool is_invincible_;
+
+            // Timer to give objects a cooldown when receiving damage from entities that encounter them head on
+            Timer dmg_cooldown_;
+
             // Geometry
             Geometry *geometry_;
  
@@ -101,8 +108,6 @@ namespace game {
 
             // String to identify the type of GameObject
             std::string type_;
-
-            bool invincible_;
 
     }; // class GameObject
 

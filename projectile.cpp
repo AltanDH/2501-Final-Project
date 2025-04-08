@@ -1,4 +1,6 @@
+
 #include "projectile.h"
+#include "player_game_object.h"
 
 namespace game {
 
@@ -30,6 +32,11 @@ namespace game {
 			// Destroy projectile
 			hitpoints_ = 0;
 			is_destroyed_ = true;
+			
+			// Let owner know a projectile has been destroyed (only relevant for the player)
+			if (owner_->GetType() == "Player") {
+				((PlayerGameObject*)owner_)->ProjectileDestroyed();
+			}
 		}
 
 		// Modify projectile position into desired direction as long as it's not destroyed
@@ -39,36 +46,49 @@ namespace game {
 	}
 
 	// Override the Collide method for custom projectile behavior
-	void Projectile::Collide(GameObject* object) {
+	void Projectile::Collide(GameObject* other) {
 		// Make sure projectile isn't colliding with the entity that fired it
-		if (object == owner_) {
+		if (other == owner_) {
 			return;
 		}
 
 		// Check if a player or enemy collided with the projectile (thus collision valid)
-		if ((object->GetType() == "Enemy" || object->GetType() == "Player") && !(object->isDestroyed())) {
-			// Lower other object HP
-			object->SetHitpoints(object->GetHitpoints() - 1);
+		if ((other->GetType() == "Enemy" || other->GetType() == "Player") && !(other->isDestroyed())) {
+			
+			// Lower other object HP if it isn't invincible
+			if (!other->isInvincible()) {
+				other->SetHitpoints(other->GetHitpoints() - 1);
+			}
 
 			// Lower projectile hitpoints
 			hitpoints_--;
 			// Change state to 'destroyed' if necessary
 			if (hitpoints_ <= 0 && !is_destroyed_) {
 				is_destroyed_ = true;
+
+				// Let owner know a projectile has been destroyed (only relevant for the player)
+				if (owner_->GetType() == "Player") {
+					((PlayerGameObject*)owner_)->ProjectileDestroyed();
+				}
 			}
 		}
 
 		// Mothership collision treated seperately in case of special changes for Boss interactions
 		// All projectiles will hurt mothership (Friendly fire included)
-		if (object->GetType() == "Mothership" && !(object->isDestroyed())) {
+		if (other->GetType() == "Mothership" && !(other->isDestroyed())) {
 			// Lower mothership HP
-			object->SetHitpoints(object->GetHitpoints() - 1);
+			other->SetHitpoints(other->GetHitpoints() - 1);
 
 			// Lower projectile hitpoints
 			hitpoints_--;
 			// Change state to 'destroyed' if necessary
 			if (hitpoints_ <= 0 && !is_destroyed_) {
 				is_destroyed_ = true;
+
+				// Let owner know a projectile has been destroyed (only relevant for the player)
+				if (owner_->GetType() == "Player") {
+					((PlayerGameObject*)owner_)->ProjectileDestroyed();
+				}
 			}
 		}
 	}

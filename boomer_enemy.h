@@ -21,9 +21,9 @@ namespace game {
 			BoomerEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* target, Mothership* mothership = nullptr);
 
 			// Override inherited function from EnemyGameObject <- GameObject
-			inline glm::vec3 GetVelocity() { return velocity_; }
+			inline const glm::vec3& GetVelocity(void) const { return velocity_; }
 			inline void SetVelocity(const glm::vec3& velocity) override { velocity_ = velocity; }
-			inline PlayerGameObject* GetTarget() { return (PlayerGameObject*)target_; }
+			inline PlayerGameObject* GetTarget(void) const { return (PlayerGameObject*)target_; }
 
 			// Orbit get and set
 			inline bool IsInOrbit() const { return inOrbit_; }

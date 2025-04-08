@@ -15,13 +15,14 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     radius_ = 0.4f;
     hitpoints_ = 1;
     is_destroyed_ = false;
+    is_invincible_ = false;
     ghost_ = false;
+    dmg_cooldown_ = Timer();
     geometry_ = geom;
     shader_ = shader;
     texture_ = texture;
     timer_ = Timer();
     type_ = "Default";
-    invincible_ = false;
 }
 
 
@@ -53,13 +54,17 @@ void GameObject::SetRotation(float angle){
 }
 
 void GameObject::SetHitpoints(int health) {
-    hitpoints_ = health;
+    
+    // Make sure health is only set to a lower value if object not invincible, otherwise it's fine to increase health
+    if ((health < hitpoints_ && !is_invincible_) || health >= hitpoints_) {
+        hitpoints_ = health;
 
-    // change state to 'destroyed' if necessary
-    if (hitpoints_ <= 0 && !is_destroyed_) {
-        is_destroyed_ = true;
-        // set timer for duration until object deletion
-        timer_.Start(5.0f);
+        // change state to 'destroyed' if necessary
+        if (hitpoints_ <= 0 && !is_destroyed_) {
+            is_destroyed_ = true;
+            // set timer for duration until object deletion
+            timer_.Start(3.0f);
+        }
     }
 }
 
@@ -68,16 +73,16 @@ void GameObject::SetVelocity(const glm::vec3& velocity) {
 
 }
 
-void GameObject::Collide(GameObject* object) {
-    // Don't allow collisions with collectibles by default
-    if ((object->GetType() != "Collectible" || object->GetType() != "Pulse" || object->GetType() != "Projectile") && !invincible_) {
+void GameObject::Collide(GameObject* other) {
+    // Don't allow collisions with items that have special reactions (need to be handled in their own methods)
+    if (other->GetType() != "Collectible" && other->GetType() != "Pulse" && other->GetType() != "Projectile" && other->GetType() != "Barrier" && !is_invincible_) {
         // lower hitpoints
         hitpoints_--;
         // change state to 'destroyed' if necessary
         if (hitpoints_ <= 0 && !is_destroyed_) {
             is_destroyed_ = true;
             // set timer for duration until object deletion
-            timer_.Start(5.0f);
+            timer_.Start(3.0f);
         }
     }
 }

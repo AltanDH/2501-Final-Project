@@ -26,7 +26,6 @@ namespace game {
 			// Target for enemy objects to track so as to remain within its vicinity
 			Mothership* mothership_;
 
-
 			// Pointer to game objects stored in game (some enemy types require access to it to add relevant data)
 			std::vector<GameObject*>* game_objects_ref_;
 

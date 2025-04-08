@@ -1,5 +1,4 @@
 #include "player_game_object.h"
-#include <iostream>
 
 namespace game {
 
@@ -11,12 +10,17 @@ namespace game {
 // Overrided the constructor for additional attribute initialization
 PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Shader *shader, GLuint texture)
 	: GameObject(position, geom, shader, texture) {
-	hitpoints_ = 3;
+	
+	hitpoints_ = 10;
 	type_ = "Player";
-	collectible_count_ = 0;
-	is_invincible_ = false;
+
 	invincibility_duration_ = Timer();
-	shooting_cooldown_ = Timer();
+	collectible_count_ = 0;
+	
+	projectile_cooldown_ = Timer();
+	pulse_cooldown_ = Timer();
+	projectile_count_ = 0;
+
 	velocity_ = glm::vec3(0.005f, 0.005f, 0.0f);
 	acceleration_ = 0.003;
 	max_velocity_ = 8.0;
@@ -24,7 +28,6 @@ PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Sh
 
 // Update function for moving the player object around
 void PlayerGameObject::Update(double delta_time) {
-	std::cout << "Player pos: " << this->GetPosition().x << ", " << this->GetPosition().y << std::endl;
 
 	// Special player updates go here
 	// Check if player collected enough collectibles to trigger invincibility
@@ -56,28 +59,35 @@ void PlayerGameObject::Update(double delta_time) {
 }
 
 // Override the Collide method for custom Player behavior
-void PlayerGameObject::Collide(GameObject* object) {
+void PlayerGameObject::Collide(GameObject* other) {
 	// Check if collided/picked up a collectible
-	if (object->GetType() == "Collectible") {
+	if (other->GetType() == "Collectible") {
 		collectible_count_++;
 	}
 	// Otherwise deal with consequences of collision with enemy (as long as player is not invincible)
-	else if (object->GetType() == "Enemy" && !is_invincible_) {
-		// lower hitpoints
-		hitpoints_--;
-		// change state to 'destroyed' if necessary
-		if (hitpoints_ <= 0 && !is_destroyed_) {
-			is_destroyed_ = true;
-			// set timer for duration until object deletion
-			timer_.Start(5.0f);
+	else if ((other->GetType() == "Enemy" || other->GetType() == "Mothership") && !is_invincible_) {
+		
+		// Lower Mothership HP respecting the damage cooldown
+		if (dmg_cooldown_.Finished()) {
+			hitpoints_--;
+
+			// Change state to 'destroyed' if necessary
+			if (hitpoints_ <= 0 && !is_destroyed_) {
+				is_destroyed_ = true;
+				// Set timer for duration until object deletion
+				timer_.Start(3.0f);
+			}
+
+			// Reset dmg cooldown
+			dmg_cooldown_.Start(0.8f);
 		}
 	}
 }
 
 // Function that fires projectile and returns its pointer, or nullptr if none were fired
-Projectile* PlayerGameObject::Fire(GLuint texture) {
-	// If firing cooldown hasn't ended there is nothing to return (since nothing was fired)
-	if (!shooting_cooldown_.Finished()) {
+Projectile* PlayerGameObject::FireProjectile(GLuint texture) {
+	// If firing cooldown hasn't ended, or too many projectiles exist, then there is nothing to return (since nothing was fired)
+	if (!projectile_cooldown_.Finished() || projectile_count_ >= 3) {
 		return nullptr;
 	}
 
@@ -87,10 +97,29 @@ Projectile* PlayerGameObject::Fire(GLuint texture) {
 	projectile->SetRotation(angle_);
 
 	// Reset shooting cooldown
-	shooting_cooldown_.Start(1.0f);
+	projectile_cooldown_.Start(0.15f);
+	// Increase amount of projectiles fired
+	projectile_count_++;
 
 	// Return resulting projectile pointer
 	return projectile;
+}
+
+// Function that fires pulse and returns its pointer, or nullptr if none were fired
+Pulse* PlayerGameObject::FirePulse(GLuint texture) {
+	// If firing cooldown hasn't ended then there is nothing to return (since nothing was fired)
+	if (!pulse_cooldown_.Finished()) {
+		return nullptr;
+	}
+
+	// Create pulse to fire
+	Pulse* pulse = new Pulse(position_, geometry_, shader_, texture, this);
+
+	// Reset shooting cooldown
+	pulse_cooldown_.Start(2.1f);
+
+	// Return resulting projectile pointer
+	return pulse;
 }
 
 } // namespace game

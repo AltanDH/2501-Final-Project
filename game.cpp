@@ -13,8 +13,9 @@
 #include "mothership_boss.h"
 #include "collectible_game_object.h"
 #include "projectile.h"
+//#include "hierarchical_transformation.h"
 #include "game.h"
-#include "hierarchical_transformation.h"
+
 
 namespace game {
 
@@ -53,7 +54,8 @@ void Game::SetupGameWorld(void)
            tex_pulse = 10,
            tex_collectible = 11,
            tex_stars = 12,
-           tex_orb = 13};
+           tex_orb = 13,
+           tex_empty = 14};
     textures.push_back("/textures/player.png");
     textures.push_back("/textures/invincible.png");
     textures.push_back("/textures/mothership.png");
@@ -66,8 +68,9 @@ void Game::SetupGameWorld(void)
     textures.push_back("/textures/projectile_enemy.png");
     textures.push_back("/textures/pulse.png");
     textures.push_back("/textures/Powerups/collectible.png");
-    textures.push_back("/textures/stars2.png");
+    textures.push_back("/textures/stars.png");
     textures.push_back("/textures/orb.png");
+    textures.push_back("/textures/empty.png");
     // Load textures
     LoadTextures(textures);
 
@@ -80,42 +83,34 @@ void Game::SetupGameWorld(void)
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
 
-    /*
     // Spawn Mothership (boss)
     // Note that, in this specific implementation, the boss object will always be the second object in the game object vector
     Mothership* mothership = new Mothership(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_, game_objects_[0]);
     mothership->SetGameObjectsRef(&game_objects_);
-    mothership->LoadBarriers();
     mothership->SetRotation(pi_over_two);
     game_objects_.push_back(mothership);
-    */
 
-    // HIERARCHICAL TRANSFORMATION
+    // Load boss area (place barries to encase player)
+    mothership->LoadBarriers();
+
+    /* HIERARCHICAL TRANSFORMATION
     GameObject* obj1 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_boomer]);
     GameObject* obj2 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player]);
     GameObject* obj3 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player]);
     GameObject* obj4 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_fighter]);
-    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, glm::vec3(-30.0f, -30.0f, 0.0f), sprite_, &sprite_shader_, NULL);
+    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, glm::vec3(-30.0f, -30.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
     game_objects_.push_back(hier);
     game_objects_.push_back(obj1);
     game_objects_.push_back(obj2);
     game_objects_.push_back(obj3);
-    game_objects_.push_back(obj4);
+    game_objects_.push_back(obj4);*/
 
-    // Spawn the boomer
-    BoomerEnemy* boomer = new BoomerEnemy(glm::vec3(5.0f, 5.0f, 0.0f), sprite_, &sprite_shader_, tex_[4], game_objects_[0]);
-    game_objects_.push_back(boomer);
-
-    // Spawn fighter
-    FighterEnemy* fighter = new FighterEnemy(glm::vec3(4.0f, 1.0f, 0.0f), sprite_, &sprite_shader_, tex_[6], tex_[9], (PlayerGameObject*) game_objects_[0]);
-    game_objects_.push_back(fighter);
-
-    // Spawn a Planet
+    /* Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
     CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet->SetScale(4.0f);
-    celestial_objects_.push_back(planet);
-
+    celestial_objects_.push_back(planet);*/
+    
     // Create a scale for the background texture coordinates enhancing
     float texture_coord_scale = 100.0f;
     // Make a new sprite allowing for the background tiling effect
@@ -129,7 +124,6 @@ void Game::SetupGameWorld(void)
 
     // In this specific implementation, the background will always be the last object
     game_objects_.push_back(background);
-
 }
 
 
@@ -189,18 +183,30 @@ void Game::HandleControls(double delta_time)
         player->SetRotation(angle + angle_increment);
         //player->SetVelocity(velocity * (dir - angle_increment));
     }
-    
+
     // Fire projectile if requested
     if (glfwGetKey(window_, GLFW_KEY_F) == GLFW_PRESS) {
-        // Call the Fire function from player which will return the created projectile (only if the cooldown is complete, nullptr otherwise)
-        // Cooldown logic handled in Fire function
-        // We type cast the returned pointer to add it into game_objects_
-        GameObject* projectile = (GameObject*) player->Fire(tex_[8]);
+        // Call the Fire function from player which will return the created projectile, or nullptr if not fired
+        // Cooldown & Too many bullets fired logic handled within Fire function
+        GameObject* projectile = player->FireProjectile(tex_[8]);
 
         // Make sure we received a valid projectile (meaning one was fired)
         if (projectile != nullptr) {
             // Add it to game objects (we insert it right before the background to avoid collision detection issues)
             game_objects_.insert(game_objects_.end() - 1, projectile);
+        }
+    }
+
+    // Fire pulse if requested
+    if (glfwGetKey(window_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        // Call the Fire function from player which will return the created pulse, or nullptr if not fired
+        // Cooldown logic handled within Fire function
+        GameObject* pulse = player->FirePulse(tex_[10]);
+
+        // Make sure we received a valid pulse (meaning one was fired)
+        if (pulse != nullptr) {
+            // Add it to game objects (we insert it right before the background to avoid collision detection issues)
+            game_objects_.insert(game_objects_.end() - 1, pulse);
         }
     }
 
@@ -242,14 +248,14 @@ void Game::Update(double delta_time)
         // Check for collision with other game objects
         // Note the loop bounds: we avoid testing the last object since
         // it's the background covering the whole game world
-        for (int j = i + 1; j < (game_objects_.size()-1); j++) {
+        for (int j = i + 1; j < (game_objects_.size() - 1); j++) {
             GameObject* other_game_object = game_objects_[j];
 
             // Don't waste time on already destroyed objects
             if (!current_game_object->isDestroyed() && !other_game_object->isDestroyed()) {
                 // Compute distance between both objects (to be used for circle-circle collision)
                 float distance = glm::length(current_game_object->GetPosition() - other_game_object->GetPosition());
-                
+
                 // Check if Projectiles are involved (then Ray-Circle method necessary)
                 if (current_game_object->GetType() == "Projectile") {
                     if (RayCircleCollision(current_game_object->GetPosition(), current_game_object->GetBearing(), other_game_object->GetPosition(), other_game_object->GetRadius(), ((Projectile*)current_game_object)->GetSpeed(), delta_time)) {
@@ -269,13 +275,25 @@ void Game::Update(double delta_time)
                     current_game_object->Collide(other_game_object);
                     other_game_object->Collide(current_game_object);
                 }
-                
+
                 // Change object texture to explosions if destroyed (except for collectibles)
                 if (current_game_object->isDestroyed() && current_game_object->GetType() != "Collectible") {
                     current_game_object->SetTexture(tex_[7]);
+
+                    // Update total enemy count (all enemies are spawned by mothership for the purposes of this project)
+                    if (current_game_object->GetType() == "Enemy") {
+                        // For the purposes of this project, the Mothership is always maintained in the second position of the array
+                        ((Mothership*)game_objects_[1])->EnemyDied();
+                    }
                 }
                 if (other_game_object->isDestroyed() && other_game_object->GetType() != "Collectible") {
                     other_game_object->SetTexture(tex_[7]);
+
+                    // Update total enemy count (all enemies are spawned by mothership for the purposes of this project)
+                    if (other_game_object->GetType() == "Enemy") {
+                        // For the purposes of this project, the Mothership is always maintained in the second position of the array
+                        ((Mothership*)game_objects_[1])->EnemyDied();
+                    }
                 }
             }
         }
@@ -326,13 +344,23 @@ void Game::Update(double delta_time)
     for (int i = 0; i < game_objects_.size(); i++) {
         // Make sure correct conditions have been met
         if (game_objects_[i]->isDestroyed() && game_objects_[i]->GetTimer().Finished()) {
-            // Check if its the player that we're deleting (meaning the player lost)
-            if (i == 0) {
+            // Check if we're deleting the player or mothership (win condition met)
+            if (i == 0 || i == 1) {
+
+                // Player is always the first item in game_objects_ array so we'd know they lost if they're getting deleted
+                if (i == 0) {
+                    // Provide feedback to user
+                    std::cout << "Game Over!" << std::endl;
+                }
+
+                // Mothership (Boss) is always the second item in game_objects_ array so we'd know player won if it's getting deleted
+                else if (i == 1) {
+                    // Feedback to user
+                    std::cout << "Victory!! Well done." << std::endl;
+                }
+
                 // Free memory used by game world
                 DestroyGameWorld();
-
-                // Provide feedback to user
-                std::cout << "Game Over!" << std::endl;
 
                 // Free rendering resources
                 delete sprite_;
@@ -344,11 +372,6 @@ void Game::Update(double delta_time)
                 // Terminate program
                 exit(0);
             }
-
-            // Avoid deleting collectibles for the sake of the assignment (testing ghost mode)
-            if (game_objects_[i]->GetType() == "Collectible") {
-                continue;
-            }
             
             // Otherwise we're deleting a normal game object
             delete game_objects_[i];
@@ -356,7 +379,7 @@ void Game::Update(double delta_time)
             game_objects_.erase(game_objects_.begin() + i);
             
             // Re-adjust the index since we just deleted an object
-            i--;  
+            i--;
         }
     }
 }
@@ -416,8 +439,8 @@ void Game::SpawnCollectible(void) {
     if (collectible_spawn_timer_.Finished()) {
         // Generate random spawn position
         glm::vec3 spawn_position = glm::vec3(0.0f, 0.0f, 0.0f);
-        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 9 - 4;
-        spawn_position.y = game_objects_[1]->GetPosition().y + rand() % 9;
+        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 20 - 4;
+        spawn_position.y = game_objects_[1]->GetPosition().y - rand() % 20 - 4;
 
         // Create a new collectible game object at the spawn position
         // note that tex[11] already defined as corresponding collectible texture
@@ -539,7 +562,7 @@ void Game::Init(void)
 
     // Initialize timer to spawn collectibles
     collectible_spawn_timer_ = Timer();
-    collectible_spawn_timer_.Start(10.0f);
+    collectible_spawn_timer_.Start(6.0f);
 }
 
 

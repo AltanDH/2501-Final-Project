@@ -30,11 +30,14 @@ namespace game {
 			// Loads in the barriers for the boss area
 			void LoadBarriers(void);
 
+			// Records spawned enemy death
+			void EnemyDied(void);
+
 			// Spawns an Enemy
 			void SpawnEnemy(void);
 
 			// Override collide method for custom behavior
-			void Collide(GameObject* object) override;
+			void Collide(GameObject* other) override;
 
 			// Override update method for custom behavior
 			void Update(double delta_time) override;

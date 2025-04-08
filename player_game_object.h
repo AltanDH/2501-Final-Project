@@ -3,6 +3,7 @@
 
 #include "game_object.h"
 #include "projectile.h"
+#include "pulse.h"
 
 namespace game {
 
@@ -16,23 +17,21 @@ namespace game {
             void Update(double delta_time) override;
 
             // Overrided function inherited from GameObject for custom reaction to collisions
-            void Collide(GameObject* object) override;
+            void Collide(GameObject* other) override;
 
             // Function that fires projectile and returns its pointer, or nullptr if none were fired
-            Projectile* Fire(GLuint texture);
-
-            // Getter for invincibility state
-            inline bool isInvincible(void) const { return is_invincible_; }
-            inline void SetInvincible(bool b) { is_invincible_ = b; }
+            Projectile* FireProjectile(GLuint texture);
+            // Function that fires pulse and returns its pointer, or nullptr if none were fired
+            Pulse* FirePulse(GLuint texture);
 
             // Getters
             inline glm::vec3 GetVelocity(void) const { return velocity_; }
             inline float GetAcceleration(void) const { return acceleration_; }
-            inline Timer GetTimer(void) const { return invincibility_duration_; }
 
             // Setters
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }
             inline void SetAcceleration(float acceleration) { acceleration_ = acceleration; }
+            inline void ProjectileDestroyed(void) { projectile_count_--; }
 
         protected:
             // Values for implementing physics-based movement
@@ -43,14 +42,15 @@ namespace game {
             // Tracker for collectibles gathered by player
             int collectible_count_;
 
-            // Boolean to track invincibility state
-            bool is_invincible_;
-
             // Timer to track invinvibility duration
             Timer invincibility_duration_;
 
-            // Timer to track projectile firing cooldown
-            Timer shooting_cooldown_;
+            // Timer to add projectile firing cooldown to avoid multiple shots being fired at one click
+            Timer projectile_cooldown_;
+            // Timer to add pulse firing cooldown (only 1 pulse can be shot at a time)
+            Timer pulse_cooldown_;
+            // Tracker for total projectiles fired
+            int projectile_count_;
 
     }; // class PlayerGameObject
 

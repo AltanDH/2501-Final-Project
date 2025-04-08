@@ -18,7 +18,7 @@ namespace game {
         void Update(double delta_time) override;
 
         // Overrided function inherited from GameObject for custom reaction to collisions
-        void Collide(GameObject* object) override;
+        void Collide(GameObject* other) override;
 
     protected:
         // Values for implementing projectile movement

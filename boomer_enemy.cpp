@@ -4,7 +4,6 @@
 #include "boomer_enemy.h"
 #include "celestial_body.h"
 #include "mothership_boss.h"
-#include <iostream>
 
 namespace game {
 
@@ -24,7 +23,6 @@ namespace game {
 	void BoomerEnemy::Update(double delta_time) {
 		// Euler integration
 		// Calculate resulting velocity
-		//glm::vec3 velocity = glm::normalize(direction_ * speed_);
 		// Apply it to the current position
 		if (!is_destroyed_ && !inOrbit_) {
 			direction_ = glm::normalize(target_->GetPosition() - position_);
@@ -48,10 +46,15 @@ namespace game {
 
 			// Clamp rotation angle so that it does't happen too quickly
 			angle_ += glm::clamp(angle_diff, -1.5f * (float)delta_time, 1.5f * (float)delta_time);
-		}
 
-		//std::cout << "SPEED: " << glm::length(velocity_) << std::endl;
-		//std::cout << "INORBIT: " << inOrbit_ << std::endl;
+			// Also update position based on mothership (if it exists), to remain within boss area
+			if (mothership_ != nullptr && !mothership_->isDestroyed()) {
+				// Calculate resulting velocity from Mothership
+				glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+				// Apply it to the current position so enemy keeps following mothership
+				position_ += velocity * (float)delta_time;
+			}
+		}
 	}
 
 } // namespace game

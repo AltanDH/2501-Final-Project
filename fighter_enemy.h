@@ -29,7 +29,7 @@ namespace game {
 			void Fire();
 
 			// Implement function inherited from EnemyGameObject <- GameObject
-			inline glm::vec3 GetVelocity() { return velocity_; }
+			inline const glm::vec3& GetVelocity(void) const { return velocity_; }
 			inline void SetVelocity(const glm::vec3& velocity) override { velocity_ = velocity; }
 
 			// Override update method for custom behavior
@@ -42,7 +42,7 @@ namespace game {
 			// Enemy state (can be either "wandering", "in pursuit", or "chase")
 			std::string state_;
 
-			// Desired direction vector for pursuit
+			// Desired direction vector to aid in wandering
 			glm::vec3 direction_;
 
 			// Velocity for movement physics
@@ -50,9 +50,6 @@ namespace game {
 
 			// Enemy speed
 			float speed_;
-
-			// Timer for trajectory correction/target recalculation during "pursuit"
-			Timer recalibration_interval_;
 
 			// Timer for updating the "wandering" state target
 			Timer wandering_update_;

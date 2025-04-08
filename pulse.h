@@ -16,7 +16,7 @@ namespace game {
         void Update(double delta_time) override;
 
         // Overrided collision for custom behavior
-        void Collide(GameObject* object) override;
+        void Collide(GameObject* other) override;
 
     protected:
         // Value used to control pulse expansion

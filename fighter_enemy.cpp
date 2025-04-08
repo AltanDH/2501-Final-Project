@@ -16,13 +16,12 @@ namespace game {
 		// Trackers for target pursuit
 		target_ = target;
 		direction_ = target->GetPosition() - position;
-		recalibration_interval_ = Timer();
 
 		// Timer for wandering update
 		wandering_update_ = Timer();
 
 		// Speed
-		speed_ = 0.2f;
+		speed_ = 1.5f;
 		velocity_ = glm::vec3(0);
 
 		// Texture for the projectiles
@@ -45,7 +44,7 @@ namespace game {
 		projectile->SetRotation(angle_);
 
 		// Reset shooting cooldown
-		shooting_cooldown_.Start(1.0f);
+		shooting_cooldown_.Start(2.4f);
 
 		// Adds resulting projectile pointer to game objects (for collision checks)
 		game_objects_ref_->insert(game_objects_ref_->end() - 1, projectile);
@@ -54,134 +53,95 @@ namespace game {
 	// Override update method for custom behavior
 	void FighterEnemy::Update(double delta_time) {
 		
-		// Check if enemy in pursuit
-		if (state_ == "in pursuit" && !is_destroyed_) {
-			// If close enough to target change state to chase
-			float distance = glm::length(position_ - target_->GetPosition());
-			if (distance <= 0.4) {
-				state_ = "chase";
-			}
-			
-			// Otherwise continune normal pursuit behavior
-			else {
-				// Get Target predicted (future) position
-				glm::vec3 target = target_->GetPosition() + target_->GetVelocity();
-				// Steering to target
-				glm::vec3 steering = target - (position_ + velocity_);
-				steering /= glm::length(steering);
-				steering *= 0.1; // Adjust force magnitude
-				// Update velocity
-				velocity_ += steering;
-
-				// Fire when possible (function handles logic)
-				Fire();
-			}
+		// Do nothing if destroyed
+		if (is_destroyed_) {
+			return;
 		}
-		
-		// Check if enemy is chasing target more directly
-		if (state_ == "chase" && !is_destroyed_) {
-			// Get Target precise position
-			glm::vec3 target = target_->GetPosition();
-			// Create valid Steering to target
-			glm::vec3 steering = target - (position_ + velocity_);
-			steering /= glm::length(steering);
-			steering *= 0.1; // Adjust force magnitude
-			// Update velocity
-			velocity_ += steering;
 
-			// Fire when possible (function handles logic)
-			Fire();
+		// Calculate distance to player
+		float distance_to_target = glm::length(position_ - target_->GetPosition());
+
+		// Handle state transitions
+		if (state_ == "wandering" && distance_to_target <= 8.0f) {
+			state_ = "in pursuit";
+			speed_ = 2.5f;
 		}
-		
-		// Check if enemy needs to wander
-		else if (state_ == "wandering" && !is_destroyed_) {
-			// Wander mechanic
+		else if (state_ == "in pursuit" && distance_to_target <= 2.0f) {
+			state_ = "chase";
+			speed_ = 3.0f;
+		}
+
+		// Declare variable for the position we want to reach
+		glm::vec3 target_position;
+
+		// State machine logic
+		// Wandering mechanic (selecting target)
+		if (state_ == "wandering") {
 			if (wandering_update_.Finished()) {
-				// Random point in angle opening
-				float r_num = ((float)rand()) / ((float)RAND_MAX);
-				float opening = 5.0 * 3.141592 / 180.0; // Add PI from the glmlibrary
-				float r_angle = r_num * 2.0 * opening + angle_ - opening;
-				float r = 0.25;
-				glm::vec3 target(r * cos(r_angle), r * sin(r_angle), 0.0);
-				
-				// Steering to target
-				glm::vec3 desired = target;
-				glm::vec3 steering = desired + velocity_;
-				steering /= glm::length(steering);
-				steering *= 0.1; // Adjust force magnitude
-				// Update velocity
-				velocity_ += steering;
-				
-				// Reset timer to only update wander every 1s
-				wandering_update_.Start(1.0);
-			}
+				// Get a random angle in opening
+				float random = ((float)rand()) / ((float)RAND_MAX);
+				float opening = glm::radians(45.0f);
+				float random_angle = random * 2.0f * opening + angle_ - opening;
+				float radius = 0.3f;
+				// Create a vector to it
+				direction_ = glm::vec3(radius * cos(random_angle), radius * sin(random_angle), 0.0f);
 
-			// If close enough to target change state to pursuit
-			float distance = glm::length(position_ - target_->GetPosition());
-			if (distance <= 2.0) {
-				state_ = "in pursuit";
+				// Reset wandering update
+				wandering_update_.Start(1.0f);
 			}
+			// Create resulting target position
+			target_position = position_ + direction_;
 		}
-		
-		// Apply new velocity as long as enemy not destroyed
-		if (!is_destroyed_) {
-			//glm::vec3 velocity = glm::normalize(direction_ * speed_);
-			// Apply it to the current position
-			position_ += velocity_ * (float)delta_time;
+		// Pursuit mechanic (selecting target)
+		else if (state_ == "in pursuit") {
+			target_position = target_->GetPosition() + target_->GetVelocity();
+		} 
+		// Chase mechanic (selecting target)
+		else if (state_ == "chase") {
+			target_position = target_->GetPosition();
+		}
 
-			// Calculate the angle the enemy should turn to face
+		// Calculate resulting velocity
+		glm::vec3 desired_velocity = target_position - position_;
+		if (glm::length(desired_velocity) > 0.0f) {
+			desired_velocity = glm::normalize(desired_velocity) * speed_;
+			// Smoothly interpolate to desired velocity
+			velocity_ = glm::mix(velocity_, desired_velocity, 0.05f); 
+		}
+				
+		// Rotate towards movement direction if necessary (ignore tiny rotations)
+		if (glm::length(velocity_) > 0.01f) {
+			// Determine desired angle based on velocity
 			float target_angle = atan2(velocity_.y, velocity_.x);
-			// Get the difference with current angle
-			float angle_diff = target_angle - angle_;
 
-			// Check if we'll need to rotate clockwise or counter-clockwise
-			if (angle_diff > glm::pi<float>()) {
-				// Ensure that the angle diff is within range [-pi, pi] for shortest rotation angle
-				angle_diff -= 2.0 * glm::pi<float>();
-			}
-			else if (angle_diff < glm::pi<float>()) {
-				angle_diff += 2.0 * glm::pi<float>();
-			}
+			// Calculate the smallest difference between angles (-pi to pi)
+			float delta_angle = glm::mod(target_angle - angle_ + glm::pi<float>(), (2*glm::pi<float>())) - glm::pi<float>();
 
-			// Clamp rotation angle so that it does't happen too quickly
-			angle_ += glm::clamp(angle_diff, -1.5f * (float)delta_time, 1.5f * (float)delta_time);
+			// Rotation speed in radians
+			float rotation_speed = 2.0f;
+
+			// Clamp rotation to turn speed
+			delta_angle = glm::clamp(delta_angle, -rotation_speed * (float)delta_time, rotation_speed * (float)delta_time);
+
+			// Apply rotation
+			angle_ += delta_angle;
 		}
 
-		/* Check if enemy is in pursuit
-		else if (state_ == "in pursuit" && !is_destroyed_) {
-			// Euler integration
-			// Check if its time to recalculate desired/target direction
-			if (recalibration_interval_.Finished()) {
-				direction_ = target_->GetPosition() - position_;
-				recalibration_interval_.Start(2.0f);
-			}
-			
-			// Pursuit Mechanic
-			// Calculate resulting velocity
-			glm::vec3 velocity = glm::normalize(direction_ * speed_);
-			// Apply it to the current position
-			position_ += velocity * (float)delta_time;
-
-			// Calculate the angle the enemy should turn to face
-			float target_angle = atan2(direction_.y, direction_.x);
-			// Get the difference with current angle
-			float angle_diff = target_angle - angle_;
-
-			// Check if we'll need to rotate clockwise or counter-clockwise
-			if (angle_diff > glm::pi<float>()) {
-				// Ensure that the angle diff is within range [-pi, pi] for shortest rotation angle
-				angle_diff -= 2.0 * glm::pi<float>();
-			}
-			else if (angle_diff < glm::pi<float>()) {
-				angle_diff += 2.0 * glm::pi<float>();
-			}
-
-			// Clamp rotation angle so that it does't happen too quickly
-			angle_ += glm::clamp(angle_diff, -1.5f * (float)delta_time, 1.5f * (float)delta_time);
-
-			// Fire when possible (function handles logic)
+		// Attempt to fire at player
+		if (state_ != "wandering") {
 			Fire();
-		}*/
+		}
+
+		// Apply new velocity
+		position_ += velocity_ * (float)delta_time;
+
+		// Also update position based on mothership (if it exists), to remain within boss zone in all cases
+		if (mothership_ != nullptr && !mothership_->isDestroyed()) {
+			// Calculate resulting velocity from Mothership
+			glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+			// Apply it to the current position so enemy keeps following mothership
+			position_ += velocity * (float)delta_time;
+		}
 	}
 
 } // namespace game
