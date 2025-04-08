@@ -87,10 +87,6 @@ The player and enemies can bounce of walls of the game.
 --- Assets ---
 --------------
 
-All files in "/Projectiles/*" folder
-Source: https://gisha.itch.io/2d-space-game-pack
-License: Creative Commons CC0: "No right reserved". Attribution is not required, but highly appreciated.
-Creator: gishadev
 
 All files in "/Powerups/*" folder
 Source: https://gisha.itch.io/2d-space-game-pack
@@ -106,11 +102,6 @@ Creator: Rawdanitsu
 Source:  https://opengameart.org/content/stars-parallax-backgrounds
 License: This work is released to the Public Domain / CC0 license.
 Creator: Bonsaiheldin
-
-"stars2.png"
-Source:  https://zintoki.itch.io/space-breaker
-License: CC0 1.0 license.
-Creator: zintoki
 
 "explosion.png"
 Source:  https://opengameart.org/content/pixel-explosion-12-frames

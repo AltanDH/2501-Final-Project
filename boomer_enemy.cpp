@@ -24,7 +24,7 @@ namespace game {
 		// Euler integration
 		// Calculate resulting velocity
 		// Apply it to the current position
-		if (!is_destroyed_ && !inOrbit_) {
+		if (!is_destroyed_ && !inOrbit_ && !target_->isDestroyed()) {
 			direction_ = glm::normalize(target_->GetPosition() - position_);
 			if (glm::length(velocity_) > 6) { velocity_ = glm::normalize(velocity_)*6.0f; }
 			velocity_ += direction_ * speed_;

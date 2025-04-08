@@ -1,3 +1,4 @@
+
 #include "player_game_object.h"
 
 namespace game {
@@ -11,11 +12,12 @@ namespace game {
 PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Shader *shader, GLuint texture)
 	: GameObject(position, geom, shader, texture) {
 	
-	hitpoints_ = 10;
+	hitpoints_ = 14;
 	type_ = "Player";
 
 	invincibility_duration_ = Timer();
-	collectible_count_ = 0;
+	shield_collectible_count_ = 0;
+	fuel_ = 100;
 	
 	projectile_cooldown_ = Timer();
 	pulse_cooldown_ = Timer();
@@ -31,8 +33,8 @@ void PlayerGameObject::Update(double delta_time) {
 
 	// Special player updates go here
 	// Check if player collected enough collectibles to trigger invincibility
-	if (collectible_count_ >= 5 && is_invincible_ == false) {
-		collectible_count_ -= 5;
+	if (shield_collectible_count_ >= 5 && is_invincible_ == false) {
+		shield_collectible_count_ -= 5;
 		is_invincible_ = true;
 		invincibility_duration_.Start(10.0f);
 	}
@@ -60,9 +62,30 @@ void PlayerGameObject::Update(double delta_time) {
 
 // Override the Collide method for custom Player behavior
 void PlayerGameObject::Collide(GameObject* other) {
+	
 	// Check if collided/picked up a collectible
 	if (other->GetType() == "Collectible") {
-		collectible_count_++;
+		// If Shield picked up
+		if (((CollectibleGameObject*)other)->GetSubType() == "Shield") {
+			// Increase count for invincibility
+			shield_collectible_count_++;
+		}
+		// If Health picked up
+		else if (((CollectibleGameObject*)other)->GetSubType() == "Health") {
+			// Heal
+			hitpoints_ += 2;
+			if (hitpoints_ > 14) {
+				hitpoints_ = 14;
+			}
+		}
+		// If Fuel picked up
+		else if (((CollectibleGameObject*)other)->GetSubType() == "Fuel") {
+			// Refill tank by a certain amount
+			fuel_ += 25;
+			if (fuel_ > 100) {
+				fuel_ = 100;
+			}
+		}
 	}
 	// Otherwise deal with consequences of collision with enemy (as long as player is not invincible)
 	else if ((other->GetType() == "Enemy" || other->GetType() == "Mothership") && !is_invincible_) {

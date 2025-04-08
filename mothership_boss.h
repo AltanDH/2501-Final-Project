@@ -26,6 +26,8 @@ namespace game {
 			// Getters
 			inline const glm::vec3& GetDirection(void) const { return direction_; }
 			inline float GetSpeed(void) const { return speed_; }
+			inline int GetWidth(void) const { return width_; }
+			inline int GetHeight(void) const { return height_; }
 
 			// Loads in the barriers for the boss area
 			void LoadBarriers(void);

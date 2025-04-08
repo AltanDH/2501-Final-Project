@@ -82,6 +82,7 @@ namespace game {
 
             // Load all textures
             void LoadTextures(std::vector<std::string> &textures);
+    
     }; // class Game
 
 } // namespace game

@@ -6,11 +6,14 @@ project(${PROJ_NAME})
 
 # Specify project files: header files and source files
 set(HDRS
-    file_utils.h
-    game.h
-    game_object.h
-    player_game_object.h
+	file_utils.h
+	game.h
+	game_object.h
+	player_game_object.h
 	collectible_game_object.h
+	fuel_collectible_object.h
+	shield_collectible_object.h
+	health_collectible_object.h
 	enemy_game_object.h
 	mothership_boss.h
 	boomer_enemy.h
@@ -21,19 +24,22 @@ set(HDRS
 	projectile.h
 	pulse.h
 	hierarchical_transformation.h
-    shader.h
-    geometry.h
-    sprite.h
-    timer.h
+	shader.h
+	geometry.h
+	sprite.h
+	timer.h
 )
  
 set(SRCS
-    file_utils.cpp
-    game.cpp
-    game_object.cpp
-    main.cpp
-    player_game_object.cpp
+	file_utils.cpp
+	game.cpp
+	game_object.cpp
+	main.cpp
+	player_game_object.cpp
 	collectible_game_object.cpp
+	fuel_collectible_object.cpp
+	shield_collectible_object.cpp
+	health_collectible_object.cpp
 	enemy_game_object.cpp
 	mothership_boss.cpp
 	boomer_enemy.cpp
@@ -44,11 +50,11 @@ set(SRCS
 	projectile.cpp
 	pulse.cpp
 	hierarchical_transformation.cpp
-    shader.cpp
-    sprite.cpp
-    timer.cpp
-    sprite_vertex_shader.glsl
-    sprite_fragment_shader.glsl
+	shader.cpp
+	sprite.cpp
+	timer.cpp
+	sprite_vertex_shader.glsl
+	sprite_fragment_shader.glsl
 )
 
 # Add path name to configuration file

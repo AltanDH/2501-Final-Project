@@ -11,6 +11,7 @@ namespace game {
 		: GameObject(position, geom, shader, texture) {
 		
 		type_ = "Collectible";
+		sub_type_ = "Empty";
 		// Start a timer for collectible lifespan
 		timer_.Start(10.0f);
 	}

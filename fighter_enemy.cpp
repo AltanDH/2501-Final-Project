@@ -54,7 +54,7 @@ namespace game {
 	void FighterEnemy::Update(double delta_time) {
 		
 		// Do nothing if destroyed
-		if (is_destroyed_) {
+		if (is_destroyed_ || target_->isDestroyed()) {
 			return;
 		}
 

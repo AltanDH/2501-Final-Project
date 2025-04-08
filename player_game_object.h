@@ -2,6 +2,7 @@
 #define PLAYER_GAME_OBJECT_H_
 
 #include "game_object.h"
+#include "collectible_game_object.h"
 #include "projectile.h"
 #include "pulse.h"
 
@@ -39,8 +40,9 @@ namespace game {
             float acceleration_;
             float max_velocity_;
 
-            // Tracker for collectibles gathered by player
-            int collectible_count_;
+            // Trackers for collectibles gathered by player
+            int shield_collectible_count_;
+            float fuel_;
 
             // Timer to track invinvibility duration
             Timer invincibility_duration_;

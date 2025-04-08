@@ -9,12 +9,15 @@
 
 #include "sprite.h"
 #include "shader.h"
+#include "game.h"
 #include "player_game_object.h"
 #include "mothership_boss.h"
 #include "collectible_game_object.h"
+#include "shield_collectible_object.h"
+#include "health_collectible_object.h"
+#include "fuel_collectible_object.h"
+#include "hierarchical_transformation.h"
 #include "projectile.h"
-//#include "hierarchical_transformation.h"
-#include "game.h"
 
 
 namespace game {
@@ -52,10 +55,12 @@ void Game::SetupGameWorld(void)
            tex_projectile_player = 8,
            tex_projectile_enemy = 9,
            tex_pulse = 10,
-           tex_collectible = 11,
-           tex_stars = 12,
-           tex_orb = 13,
-           tex_empty = 14};
+           tex_shield_collectible = 11,
+           tex_health_collectible = 12,
+           tex_fuel_collectible = 13,
+           tex_stars = 14,
+           tex_orb = 15,
+           tex_empty = 16};
     textures.push_back("/textures/player.png");
     textures.push_back("/textures/invincible.png");
     textures.push_back("/textures/mothership.png");
@@ -67,7 +72,9 @@ void Game::SetupGameWorld(void)
     textures.push_back("/textures/projectile_player.png");
     textures.push_back("/textures/projectile_enemy.png");
     textures.push_back("/textures/pulse.png");
-    textures.push_back("/textures/Powerups/collectible.png");
+    textures.push_back("/textures/Powerups/shield_collectible.png");
+    textures.push_back("/textures/Powerups/health_collectible.png");
+    textures.push_back("/textures/Powerups/fuel_collectible.png");
     textures.push_back("/textures/stars.png");
     textures.push_back("/textures/orb.png");
     textures.push_back("/textures/empty.png");
@@ -437,21 +444,35 @@ void Game::Render(void){
 void Game::SpawnCollectible(void) {
     // Check if it's time to spawn a collectible
     if (collectible_spawn_timer_.Finished()) {
-        // Generate random spawn position
+        // Temporary pointer for Mothership
+        Mothership* boss = (Mothership*)game_objects_[1];
+        
+        // Generate random spawn position within boss area
         glm::vec3 spawn_position = glm::vec3(0.0f, 0.0f, 0.0f);
-        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 20 - 4;
-        spawn_position.y = game_objects_[1]->GetPosition().y - rand() % 20 - 4;
+        spawn_position.x = (boss->GetPosition().x + 3 - boss->GetWidth() / 2) + rand() % (boss->GetWidth() - 4);
+        spawn_position.y =  boss->GetPosition().y - 3 - rand() % (boss->GetHeight() - 5);
 
         // Create a new collectible game object at the spawn position
-        // note that tex[11] already defined as corresponding collectible texture
-        CollectibleGameObject* new_collectible = new CollectibleGameObject(spawn_position, sprite_, &sprite_shader_, tex_[11]);
+        int rand_choice = rand() % 3;
+        CollectibleGameObject* new_collectible;
+
+        if (rand_choice == 0) {
+            new_collectible = new ShieldCollectibleObject(spawn_position, sprite_, &sprite_shader_, tex_[11]);
+        }
+        else if (rand_choice == 1) {
+            new_collectible = new HealthCollectibleObject(spawn_position, sprite_, &sprite_shader_, tex_[12]);
+        }
+        else {
+            new_collectible = new FuelCollectibleObject(spawn_position, sprite_, &sprite_shader_, tex_[13]);
+        }
 
         // Add the new collectible to game objects list (note we insert it such that it gets added right before the background to avoid collision detection mismatch)
         game_objects_.insert(game_objects_.end() - 1, new_collectible);
 
-        collectible_spawn_timer_.Start(rand() % 8 + 7);
+        collectible_spawn_timer_.Start(((float)rand() / RAND_MAX) * 3 + 5);
     }
 }
+
 
 // Perform Ray-Circle Collision check
 bool Game::RayCircleCollision(const glm::vec3& proj_pos, const glm::vec3& proj_dir, const glm::vec3& other_pos, float other_rad, float proj_speed, double delta_time) {
