@@ -3,103 +3,83 @@ We developed the final project on Windows.
 Group members list ?
 ////// List all implemented aspects and where to find them //////
 
-------------
--- PART 1 --
-------------
+--------------------
+-- Game Mechanics --
+--------------------
+The player must fight enemies while attempting to defeat a boss.
+The boss spawns the 3 types of enemies which attempt to defeat the player.
+The player wins once the boss dies.
 
-Added 'velocity_', 'acceleration_' and 'max_velocity_' attributes to "player_game_object.h".
-And initialized them in "player_game_object.cpp".
+-------------
+-- Enemies --
+-------------
+Boomer's try to chase the player and collide with them (boomers do extra damage).
+Dreadnauts moves in parametric motion and releases a pulse around it which pushes any player and enemy entity.
+Fighter's attempt to kill the player by shooting them.
 
-Modified the 'Update' function in "player_game_object.cpp" to properly modify player position using velocity.
-
-Created 'GetVelocity', 'GetAcceleration' and 'SetVelocity' methods in "player_game_object.h".
-
-Modified 'HandleControls' method in "game.cpp" to use our new methods for physics-based player movement.
+-------------
+-- Weapons --
+-------------
+Weapons have different sprites.
+Can fire a projectile with ray circle collision.
+Has a pulse which functions identically to the dreadnaut.
 
 ------------------
--- PART 2 and 3 --
+-- Collectibles --
 ------------------
 
-Added a 'bullet.png' image for projectiles into to the 'textures' folder of the project.
-Source:
-https://opengameart.org/content/bullet-symbol
-License:
-Public domain
 
-Added "projectile.h" and "projectile.cpp" files, and modified "CMakeLists.txt" accordingly.
-Implemented the projectile class appropriately as requested in the assignment specification.
+----------------------------------
+-- Movement and Transformations --
+----------------------------------
+Movement is handled in render functions using transformations.
+The player, fighter, and boomer have physics based movement.
+The dreadnaught has parametric movement.
 
-Modified 'SetupGameWorld' method in "game.cpp" to add projectile texture.
 
-Added a 'shooting_cooldown_' attribute to "player_game_object.h", and initialized it in "player_game_object.cpp".
-Added a 'Fire' method in "player_game_object.h" to handle projectile creation/cooldown, and implemented it in "player_game_object.cpp".
+-------------------------
+-- Collision detection --
+-------------------------
+Collision detection with circle-circle collision, ray-circle collision.
+There is various collision detection behaviour between collectibles, players, enemies, walls, and planets.
 
-Added 'include "projectile.h"' statement to "game.cpp".
-Modified 'HandleControls' method in "game.cpp" so that player fires projectile when pressing the 'F' key (if the shooting cooldown of 1s is complete).
+----------------
+-- Game World --
+----------------
+The screen is continuously scrolling upward.
+The game is tiled 100x100.
 
-------------
--- PART 4 --
-------------
+----------------------
+-- Particle Systems --
+----------------------
 
-Already implented from previous assignment.
 
-------------
--- PART 5 --
-------------
+---------------------------------------------------------------------
+-- Hierarchical Transformation of a Chain of at Least Three Linkes --
+---------------------------------------------------------------------
 
-Added 'RayCircleCollision' method in "game.h" and implemented it in "game.cpp".
+--------
+-- UI --
+--------
 
-Modified 'Update' method of "game.cpp" to call for 'RayCircleCollision' when Projectiles are involved, and uses Circle-Circle detection otherwise.
 
-Made a 'GetSpeed' method in "projectile.h".
+---------------------
+-- Advanced Method --
+---------------------
+The enemies have a wandering, pursuit, and chase.
 
-------------
--- PART 6 --
-------------
+-----------
+-- Bonus --
+-----------
+Player and certain enemies get acted on by gravity using formula: (GravityConstant*Radius/DistanceToPlanet)*delta_time.
+When orbiting a planet close by, the game also uses rotation based movement where player/boomer velocity vectors are rotated for smoother movement (can be found in celestial body).
+To do this we take the vector from the planet to the player/boomer, get the left or right side vector depending on if we are rotating counter-clockwise or clockwise around the planet, 
+then nudge the player/boomer velocity vector towards the left or right side vector (which is a tangent to the circle at that point).
+This allows the player/boomer to rotate their velocity vector towards the tangent of the circle at player/boomer position allowing for rotation based movement.
 
-Modified the 'Render' method in "game.cpp" to make the camera move with the player object.
-
-Modified the 'SetTexture' method of "game.cpp" to use GL_REPEAT for the texture wrapping.
-
-Added a 'texture_scale_' attribute to "Sprite.h", and initialized it in "Sprite.cpp".
-Made an alternative Constructor for "Sprite.h" and implemented it in "Sprite.cpp".
-
-Modified the 'CreateGeometry' method of "Sprite.cpp" to make use of the 'texture_scale_' attribute.
-
-Modified the 'SetupGameWorld' method of "game.cpp" to: 
-	- Create an alternative Sprite for the background game object.
-	- Change the scalar used for the background.
-
-------------
--- PART 7 --
-------------
-
-Modified the game object constructor in "game_object.h" and "game_object.cpp" to take values for x and y scaling with default values given.
-
-Modified the 'scale_' attribute in "game_object.h" to be a vector of 2 elements, and changed its initialization in "game_object.cpp".
-Made the appriopriate changes for 'GetScale' and 'SetScale' methods in "game_object.h" accordingly.
-
-Modified the 'SetupGameWorld' method of "game.cpp" to adjust the background 'SetScale' usage to our new one.
-
-Modified the 'Render' method in "game_object.cpp" to send the corresponding scaling matrix in the vertex shader.
-
-Modified the 'SpawnCollectible' method in "game.cpp" to make the collectibles twice as long vertically, but the same horizontally.
-
-------------
--- PART 8 --
-------------
-
-Added 'ghost_' attribute to "game_object.h" and initialized it in "game_object.cpp".
-
-Modified 'Collide' method in "collectible_game_object.cpp" to trigger ghost mode when object picked up.
-
-Modified 'Update' method in "game.cpp" so that collectibles don't get deleted anymore (remain on screen).
-
-Added a 'ghost' property to the fragment shader "sprite_fragment_shader.glsl".
-
-Modified 'Render' method in "game_object.cpp" to pass 'ghost_' attribute into fragment shader as integer variable.
-
-Modified 'main' function in fragment shader "sprite_fragment_shader.glsl" to color in grayscale when necessary.
+Boomers can chase players when orbiting a planet by adjusting their height to the planet to match the player's height while using the rotation based movement explained above.
+Otherwise, if boomer's are not close to a planet, they will simply set the player as a target and move towards it.
+The player and enemies can bounce of walls of the game.
 
 --------------
 --- Assets ---
