@@ -3,10 +3,12 @@
 
 #include "game_object.h"
 #include "enemy_game_object.h"
+#include "player_game_object.h"
 
 // Forward declare Mothership class (needed because of circular includes problems if not done)
 namespace game {
 	class Mothership;
+	class celestial_body;
 }
 
 namespace game {
@@ -19,8 +21,14 @@ namespace game {
 			BoomerEnemy(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, GameObject* target, Mothership* mothership = nullptr);
 
 			// Override inherited function from EnemyGameObject <- GameObject
-			inline void SetVelocity(const glm::vec3& velocity) override { direction_ = velocity; }
+			inline glm::vec3 GetVelocity() { return velocity_; }
+			inline void SetVelocity(const glm::vec3& velocity) override { velocity_ = velocity; }
+			inline PlayerGameObject* GetTarget() { return (PlayerGameObject*)target_; }
 
+			// Orbit get and set
+			inline bool IsInOrbit() const { return inOrbit_; }
+			inline void SetInOrbit(bool in_orbit) { inOrbit_ = in_orbit; }
+		
 			// Override update method for custom behavior
 			void Update(double delta_time) override;
 
@@ -36,6 +44,11 @@ namespace game {
 
 			// Timer for trajectory correction/target recalculation during pursuit
 			Timer recalibration_interval_;
+
+			// Boolean for if orbiting
+			bool inOrbit_;
+			glm::vec3 velocity_;
+
 	
 	}; // class BoomerEnemy
 

@@ -37,12 +37,10 @@ namespace game {
 	// Override Update method for custom behavior
 	void BossBarrier::Update(double delta_time) {
 		
-		if (mothership_ != nullptr && !mothership_->isDestroyed()) {
-			// Calculate resulting velocity from Mothership
-			glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
-			// Apply it to the current position so Barriers keep following mothership
-			position_ += velocity * (float)delta_time;
-		}
+		// Calculate resulting velocity from Mothership
+		glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+		// Apply it to the current position so Barriers keep following mothership
+		position_ += velocity * (float)delta_time;
 	}
 
 } // namespace game

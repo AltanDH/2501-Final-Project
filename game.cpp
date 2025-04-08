@@ -80,6 +80,7 @@ void Game::SetupGameWorld(void)
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
 
+    /*
     // Spawn Mothership (boss)
     // Note that, in this specific implementation, the boss object will always be the second object in the game object vector
     Mothership* mothership = new Mothership(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_, game_objects_[0]);
@@ -87,13 +88,22 @@ void Game::SetupGameWorld(void)
     mothership->LoadBarriers();
     mothership->SetRotation(pi_over_two);
     game_objects_.push_back(mothership);
+    */
 
-    /* Spawn a Planet
+    // Spawn the boomer
+    BoomerEnemy* boomer = new BoomerEnemy(glm::vec3(5.0f, 5.0f, 0.0f), sprite_, &sprite_shader_, tex_[4], game_objects_[0]);
+    game_objects_.push_back(boomer);
+
+    // Spawn fighter
+    FighterEnemy* fighter = new FighterEnemy(glm::vec3(4.0f, 1.0f, 0.0f), sprite_, &sprite_shader_, tex_[6], tex_[9], (PlayerGameObject*) game_objects_[0]);
+    game_objects_.push_back(fighter);
+
+    // Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
     CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet->SetScale(4.0f);
     celestial_objects_.push_back(planet);
-
+    /*
     // Spawn a second Planet
     CelestialBody* planet2 = new CelestialBody(glm::vec3(-8.0f, 9.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet2->SetScale(4.0f);
@@ -102,9 +112,9 @@ void Game::SetupGameWorld(void)
     // Spawn a third Planet
     CelestialBody* planet3 = new CelestialBody(glm::vec3(-2.0f, 16.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet3->SetScale(4.0f);
-    celestial_objects_.push_back(planet3);*/
+    celestial_objects_.push_back(planet3);
+   */
 
-    
     // Create a scale for the background texture coordinates enhancing
     float texture_coord_scale = 10.0f;
     // Make a new sprite allowing for the background tiling effect
@@ -118,6 +128,7 @@ void Game::SetupGameWorld(void)
 
     // In this specific implementation, the background will always be the last object
     game_objects_.push_back(background);
+    
 }
 
 
@@ -297,6 +308,12 @@ void Game::Update(double delta_time)
                 if (game_object->isDestroyed() && game_object->GetType() != "Collectible") {
                     game_object->SetTexture(tex_[7]);
                 }
+            }
+
+            // Check if the object is a boomer and apply physics
+            BoomerEnemy* boomer = dynamic_cast<BoomerEnemy*>(game_objects_[j]);
+            if (boomer != nullptr) {
+                celestial_object->BoomerChasePlayer(boomer, boomer->GetTarget(), delta_time);
             }
         }
 
