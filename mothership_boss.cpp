@@ -2,7 +2,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "mothership_boss.h"
-#include <iostream>
 
 namespace game {
 
@@ -48,39 +47,36 @@ namespace game {
 		int min_y = position_.y;
 		float pi_over_two = glm::pi<float>() / 2.0f;
 
-		std::cout << "Min x: " << min_x << std::endl;
-		std::cout << "Min y: " << min_y << std::endl;
-
 		// Setup barriers on Top Layer (left side of Boss)
-		for (int i = position_.x - width_ / 2; i < position_.x; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2, 0.0f), geometry_, shader_, tex_[3], this);
+		for (int i = position_.x - width_ / 2 - 1; i < position_.x - 1; i++) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y, 0.0f), geometry_, shader_, tex_[3], this);
 			game_objects_ref_->push_back(barrier);
 		}
 		// Setup barriers on Top Layer (right side of Boss)
-		for (int i = position_.x + 2; i < position_.x + 3 + width_/2; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2, 0.0f), geometry_, shader_, tex_[3], this);
+		for (int i = position_.x + 2; i < position_.x + 2 + width_/2; i++) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y, 0.0f), geometry_, shader_, tex_[3], this);
 			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Left Side (Top to Bottom)
-		for (int i = min_y - 2; i < position_.y - 3 - height_; i--) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x, i, 0.0f), geometry_, shader_, tex_[3], this);
+		for (int i = min_y - 1; i > position_.y - height_; i--) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x - 1, i, 0.0f), geometry_, shader_, tex_[3], this);
 			// Set barrier rotation
 			barrier->SetRotation(pi_over_two);
 			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Right Side (Top to Bottom)
-		for (int i = min_y - 2; i < position_.y - 2 - height_; i--) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x + 2 + width_, i, 0.0f), geometry_, shader_, tex_[3], this);
+		for (int i = min_y - 1; i > position_.y - height_; i--) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(min_x + 1 + width_, i, 0.0f), geometry_, shader_, tex_[3], this);
 			// Set barrier rotation
 			barrier->SetRotation(-pi_over_two);
 			game_objects_ref_->push_back(barrier);
 		}
 
 		// Setup barriers on Bottom Layer
-		for (int i = min_x; i < min_x + width_; i++) {
-			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - 2 - height_, 0.0f), geometry_, shader_, tex_[3], this);
+		for (int i = min_x - 1.5; i < min_x + 2 + width_; i++) {
+			BossBarrier* barrier = new BossBarrier(glm::vec3(i, min_y - height_, 0.0f), geometry_, shader_, tex_[3], this);
 			game_objects_ref_->push_back(barrier);
 		}
 	}

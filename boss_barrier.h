@@ -14,7 +14,7 @@ namespace game {
 		
 		public:
 			// Constructor
-			BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership);
+			BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership = nullptr);
 
 			// Override collide function for custom behavior
 			void Collide(GameObject* object) override;
