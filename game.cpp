@@ -80,30 +80,22 @@ void Game::SetupGameWorld(void)
     float pi_over_two = glm::pi<float>() / 2.0f;
     game_objects_[0]->SetRotation(pi_over_two);
 
-    /*
     // Spawn Mothership (boss)
     // Note that, in this specific implementation, the boss object will always be the second object in the game object vector
     Mothership* mothership = new Mothership(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_, game_objects_[0]);
     mothership->SetGameObjectsRef(&game_objects_);
-    mothership->LoadBarriers();
     mothership->SetRotation(pi_over_two);
     game_objects_.push_back(mothership);
-    */
 
-    // Spawn the boomer
-    BoomerEnemy* boomer = new BoomerEnemy(glm::vec3(5.0f, 5.0f, 0.0f), sprite_, &sprite_shader_, tex_[4], game_objects_[0]);
-    game_objects_.push_back(boomer);
+    // Load boss area (place barries to encase player)
+    mothership->LoadBarriers();
 
-    // Spawn fighter
-    FighterEnemy* fighter = new FighterEnemy(glm::vec3(4.0f, 1.0f, 0.0f), sprite_, &sprite_shader_, tex_[6], tex_[9], (PlayerGameObject*) game_objects_[0]);
-    game_objects_.push_back(fighter);
-
-    // Spawn a Planet
+    /* Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
     CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet->SetScale(4.0f);
     celestial_objects_.push_back(planet);
-    /*
+
     // Spawn a second Planet
     CelestialBody* planet2 = new CelestialBody(glm::vec3(-8.0f, 9.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet2->SetScale(4.0f);
@@ -112,11 +104,11 @@ void Game::SetupGameWorld(void)
     // Spawn a third Planet
     CelestialBody* planet3 = new CelestialBody(glm::vec3(-2.0f, 16.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet3->SetScale(4.0f);
-    celestial_objects_.push_back(planet3);
-   */
+    celestial_objects_.push_back(planet3);*/
 
+    
     // Create a scale for the background texture coordinates enhancing
-    float texture_coord_scale = 10.0f;
+    float texture_coord_scale = 100.0f;
     // Make a new sprite allowing for the background tiling effect
     Geometry* bckgrnd_sprite = new Sprite(texture_coord_scale);
     bckgrnd_sprite->CreateGeometry();
@@ -128,7 +120,6 @@ void Game::SetupGameWorld(void)
 
     // In this specific implementation, the background will always be the last object
     game_objects_.push_back(background);
-    
 }
 
 
@@ -325,13 +316,23 @@ void Game::Update(double delta_time)
     for (int i = 0; i < game_objects_.size(); i++) {
         // Make sure correct conditions have been met
         if (game_objects_[i]->isDestroyed() && game_objects_[i]->GetTimer().Finished()) {
-            // Check if its the player that we're deleting (meaning the player lost)
-            if (i == 0) {
+            // Check if we're deleting the player or mothership (win condition met)
+            if (i == 0 || i == 1) {
+
+                // Player is always the first item in game_objects_ array so we'd know they lost if they're getting deleted
+                if (i == 0) {
+                    // Provide feedback to user
+                    std::cout << "Game Over!" << std::endl;
+                }
+
+                // Mothership (Boss) is always the second item in game_objects_ array so we'd know player won if it's getting deleted
+                else if (i == 1) {
+                    // Feedback to user
+                    std::cout << "Victory!! Well done." << std::endl;
+                }
+
                 // Free memory used by game world
                 DestroyGameWorld();
-
-                // Provide feedback to user
-                std::cout << "Game Over!" << std::endl;
 
                 // Free rendering resources
                 delete sprite_;
@@ -343,11 +344,6 @@ void Game::Update(double delta_time)
                 // Terminate program
                 exit(0);
             }
-
-            // Avoid deleting collectibles for the sake of the assignment (testing ghost mode)
-            if (game_objects_[i]->GetType() == "Collectible") {
-                continue;
-            }
             
             // Otherwise we're deleting a normal game object
             delete game_objects_[i];
@@ -355,7 +351,7 @@ void Game::Update(double delta_time)
             game_objects_.erase(game_objects_.begin() + i);
             
             // Re-adjust the index since we just deleted an object
-            i--;  
+            i--;
         }
     }
 }
@@ -415,8 +411,8 @@ void Game::SpawnCollectible(void) {
     if (collectible_spawn_timer_.Finished()) {
         // Generate random spawn position
         glm::vec3 spawn_position = glm::vec3(0.0f, 0.0f, 0.0f);
-        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 9 - 4;
-        spawn_position.y = game_objects_[1]->GetPosition().y + rand() % 9;
+        spawn_position.x = game_objects_[1]->GetPosition().x + rand() % 20 - 4;
+        spawn_position.y = game_objects_[1]->GetPosition().y - rand() % 20 - 4;
 
         // Create a new collectible game object at the spawn position
         // note that tex[11] already defined as corresponding collectible texture
@@ -538,7 +534,7 @@ void Game::Init(void)
 
     // Initialize timer to spawn collectibles
     collectible_spawn_timer_ = Timer();
-    collectible_spawn_timer_.Start(10.0f);
+    collectible_spawn_timer_.Start(6.0f);
 }
 
 

@@ -29,7 +29,7 @@ namespace game {
 			void Fire();
 
 			// Implement function inherited from EnemyGameObject <- GameObject
-			inline glm::vec3 GetVelocity() { return velocity_; }
+			inline const glm::vec3& GetVelocity(void) const { return velocity_; }
 			inline void SetVelocity(const glm::vec3& velocity) override { velocity_ = velocity; }
 
 			// Override update method for custom behavior

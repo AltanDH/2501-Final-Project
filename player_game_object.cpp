@@ -67,7 +67,7 @@ void PlayerGameObject::Collide(GameObject* object) {
 		if (hitpoints_ <= 0 && !is_destroyed_) {
 			is_destroyed_ = true;
 			// set timer for duration until object deletion
-			timer_.Start(5.0f);
+			timer_.Start(3.0f);
 		}
 	}
 }

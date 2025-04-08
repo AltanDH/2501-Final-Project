@@ -59,7 +59,7 @@ void GameObject::SetHitpoints(int health) {
     if (hitpoints_ <= 0 && !is_destroyed_) {
         is_destroyed_ = true;
         // set timer for duration until object deletion
-        timer_.Start(5.0f);
+        timer_.Start(3.0f);
     }
 }
 
@@ -69,15 +69,15 @@ void GameObject::SetVelocity(const glm::vec3& velocity) {
 }
 
 void GameObject::Collide(GameObject* object) {
-    // Don't allow collisions with collectibles by default
-    if (object->GetType() != "Collectible" || object->GetType() != "Pulse" || object->GetType() != "Projectile") {
+    // Don't allow collisions with items that have special reactions (need to be handled in their own methods)
+    if (object->GetType() != "Collectible" || object->GetType() != "Pulse" || object->GetType() != "Projectile" || object->GetType() != "Barrier") {
         // lower hitpoints
         hitpoints_--;
         // change state to 'destroyed' if necessary
         if (hitpoints_ <= 0 && !is_destroyed_) {
             is_destroyed_ = true;
             // set timer for duration until object deletion
-            timer_.Start(5.0f);
+            timer_.Start(3.0f);
         }
     }
 }
