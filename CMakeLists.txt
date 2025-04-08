@@ -20,6 +20,7 @@ set(HDRS
 	celestial_body.h
 	projectile.h
 	pulse.h
+	hierarchical_transformation.h
     shader.h
     geometry.h
     sprite.h
@@ -42,6 +43,7 @@ set(SRCS
 	celestial_body.cpp
 	projectile.cpp
 	pulse.cpp
+	hierarchical_transformation.cpp
     shader.cpp
     sprite.cpp
     timer.cpp

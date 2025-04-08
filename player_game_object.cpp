@@ -1,4 +1,5 @@
 #include "player_game_object.h"
+#include <iostream>
 
 namespace game {
 
@@ -23,6 +24,7 @@ PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Sh
 
 // Update function for moving the player object around
 void PlayerGameObject::Update(double delta_time) {
+	std::cout << "Player pos: " << this->GetPosition().x << ", " << this->GetPosition().y << std::endl;
 
 	// Special player updates go here
 	// Check if player collected enough collectibles to trigger invincibility
@@ -67,7 +69,7 @@ void PlayerGameObject::Collide(GameObject* object) {
 		if (hitpoints_ <= 0 && !is_destroyed_) {
 			is_destroyed_ = true;
 			// set timer for duration until object deletion
-			timer_.Start(3.0f);
+			timer_.Start(5.0f);
 		}
 	}
 }

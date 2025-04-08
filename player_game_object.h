@@ -23,10 +23,12 @@ namespace game {
 
             // Getter for invincibility state
             inline bool isInvincible(void) const { return is_invincible_; }
+            inline void SetInvincible(bool b) { is_invincible_ = b; }
 
             // Getters
             inline glm::vec3 GetVelocity(void) const { return velocity_; }
             inline float GetAcceleration(void) const { return acceleration_; }
+            inline Timer GetTimer(void) const { return invincibility_duration_; }
 
             // Setters
             inline void SetVelocity(const glm::vec3& velocity) { velocity_ = velocity; }

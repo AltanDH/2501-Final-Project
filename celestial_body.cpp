@@ -134,7 +134,7 @@ namespace game {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), angle_increment, glm::vec3(0.0f, 0.0f, 1.0f));
             glm::vec4 new_vel = rotation * glm::vec4(vel, 0.0f);
             glm::vec3 final_velocity = glm::vec3(new_vel.x, new_vel.y, 0.0f);
-            std::cout << "VELOCITY: " << glm::length(final_velocity) << std::endl;
+            //std::cout << "VELOCITY: " << glm::length(final_velocity) << std::endl;
             boomer->SetVelocity(final_velocity);
             boomer->SetPosition(boomer->GetPosition() + boomer->GetVelocity() * (float)delta_time);
 

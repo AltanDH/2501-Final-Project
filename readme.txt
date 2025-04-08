@@ -57,6 +57,8 @@ The game is tiled 100x100.
 ---------------------------------------------------------------------
 -- Hierarchical Transformation of a Chain of at Least Three Linkes --
 ---------------------------------------------------------------------
+Created heirarchical transformation header and cpp which takes 4 game objects to create a heirarchical transformation object of 3 links.
+It just spins each sub-object in a circle to act as a spinning object which kills anything it touches.
 
 --------
 -- UI --

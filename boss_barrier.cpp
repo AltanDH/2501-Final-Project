@@ -10,27 +10,22 @@ namespace game {
 
 		type_ = "Barrier";
 		mothership_ = mothership;
-		dmg_cooldown_ = Timer();
 	}
 
 	// Override collide for custom behavior
 	void BossBarrier::Collide(GameObject* object) {
 
-		// Check if a player or enemy collided with the barrier (thus first collision check valid)
+		// Check if a player or enemy collided with the barrier (thus first collision valid)
 		if ((object->GetType() == "Enemy" || object->GetType() == "Player") && !(object->isDestroyed())) {
 
 			// Perform circle on wall collision check to be sure
 			glm::vec3 direction = GetBearing();
-			glm::vec3 wall_to_obj = object->GetPosition() - position_;
-			glm::vec3 proj_to_wall = position_ + direction * glm::dot(wall_to_obj, direction);
+			glm::vec3 proj_to_wall = direction * glm::dot(object->GetPosition() - position_, direction);
 
 			// Confirm collision
-			if (glm::length(object->GetPosition() - proj_to_wall) <= object->GetRadius() + 0.4) {
-				// Lower other object HP respecting the damage cooldown
-				if (dmg_cooldown_.Finished()) {
-					object->SetHitpoints(object->GetHitpoints() - 1);
-					dmg_cooldown_.Start(1.2f);
-				}
+			if (glm::length(object->GetPosition() - proj_to_wall) <= object->GetRadius()) {
+				// Lower other object HP
+				object->SetHitpoints(object->GetHitpoints() - 1);
 
 				// Make other object move away from barrier (push them away)
 				glm::vec3 away_from_wall = glm::normalize(object->GetPosition() - proj_to_wall);
@@ -39,16 +34,13 @@ namespace game {
 		}
 	}
 
-
 	// Override Update method for custom behavior
 	void BossBarrier::Update(double delta_time) {
 		
-		if (mothership_ != nullptr && !mothership_->isDestroyed()) {
-			// Calculate resulting velocity from Mothership
-			glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
-			// Apply it to the current position so Barriers keep following mothership
-			position_ += velocity * (float)delta_time;
-		}
+		// Calculate resulting velocity from Mothership
+		glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+		// Apply it to the current position so Barriers keep following mothership
+		position_ += velocity * (float)delta_time;
 	}
 
 } // namespace game

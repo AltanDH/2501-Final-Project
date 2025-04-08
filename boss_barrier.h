@@ -2,7 +2,6 @@
 #define BOSS_BARRIER_H_
 
 #include "game_object.h"
-#include "timer.h"
 
 // Forward declare Mothership class (needed because of circular includes problems if not done)
 namespace game {
@@ -15,7 +14,7 @@ namespace game {
 		
 		public:
 			// Constructor
-			BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership = nullptr);
+			BossBarrier(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership);
 
 			// Override collide function for custom behavior
 			void Collide(GameObject* object) override;
@@ -26,9 +25,6 @@ namespace game {
 		protected:
 			// Tracker for walls to move alongside the mothership
 			Mothership* mothership_;
-
-			// Timer to give the wall a cooldown when inflicting damage to entities that encounter it
-			Timer dmg_cooldown_;
 	
 	}; // class BossBarrier
 

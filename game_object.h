@@ -58,6 +58,9 @@ namespace game {
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
 
+            inline void SetInvincible(bool b) { invincible_ = b;  }
+            inline bool GetInvincible(void) const { return invincible_; }
+
             void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }
 
@@ -98,6 +101,8 @@ namespace game {
 
             // String to identify the type of GameObject
             std::string type_;
+
+            bool invincible_;
 
     }; // class GameObject
 
