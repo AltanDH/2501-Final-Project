@@ -11,6 +11,24 @@ DrawingGameObject::DrawingGameObject(const glm::vec3 &position, Geometry *geom, 
     is_invincible_ = true;
 }
 
+float DrawingGameObject::GetFillValue(void) const {
+    return fill_value_;
+}
+
+void DrawingGameObject::SetFillValue(float fill_val) {
+    // Clamp the fill value between 0.0 and 1.0 (easier to deal with in fragment shader then)
+    if (fill_val < 0.0f) {
+        fill_val = 0.0f;
+    }
+    else if (fill_val > 1.0f) {
+        fill_val = 1.0f;
+    }
+    fill_value_ = fill_val;
+}
+
+void DrawingGameObject::SetFillColor(const glm::vec4& color) {
+    fill_color_ = color;
+}
 
 void DrawingGameObject::Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixed, double current_time) {
 
@@ -34,6 +52,12 @@ void DrawingGameObject::Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixe
 
     // Set the transformation matrix in the shader
     shader_->SetUniformMat4("transformation_matrix", transformation_matrix);
+
+    // Set the fill value in the shader
+    shader_->SetUniform1f("fill_val", fill_value_);
+
+    // Set the color value in the shader
+    shader_->SetUniform4f("color", fill_color_);
 
     // Set up the geometry
     geometry_->SetGeometry(shader_->GetShaderProgram());

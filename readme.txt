@@ -101,13 +101,15 @@ All 3 enemies have different textures and so do their weapons.
 - It just spins each sub-object in a circle to act as a spinning object.
 - We were going to use it as an obstacle which knocks players and enemies around but we never got around to it.
 
+
 --------
 -- UI --
 --------
-- We have health bar placeholders for the boss and player.
-- We also have a placeholder for the player's fuel tank. 
-- And a timer placeholder for how long the game has lasted.
+- We have health bars for the boss and player.
+- We also have a bar for the player's fuel tank. 
+- And a timer for how long the game has lasted.
 - All UI elements have fixed positions on screen (will remain in place as the player and camera move to remain consistent).
+
 
 ---------------------
 -- Advanced Method --
@@ -202,4 +204,4 @@ Source:  https://zintoki.itch.io/space-breaker
 License: CC0 1.0 license.
 Creator: zintoki
 
-The other textures "orb.png", "empty.png", and "bar.png" were created by us using Paint3D.
+The other textures "bar.png", "empty.png", "orb.png" and "font.png" were created by us using Paint3D or taken from previous demos.

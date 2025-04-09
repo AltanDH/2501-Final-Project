@@ -17,10 +17,11 @@ namespace game {
             std::string GetText(void) const;
             void SetText(std::string text);
 
+            // Override to do nothing (UI shouldn't have collisions)
+            void Collide(GameObject* other) override;
+
             // Render function for the text
             void Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixed, double current_time) override;
-
-            void Collide(GameObject* other) override;
 
         private:
             std::string text_;

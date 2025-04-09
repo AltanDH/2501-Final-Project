@@ -12,6 +12,7 @@ namespace game {
 PlayerGameObject::PlayerGameObject(const glm::vec3 &position, Geometry *geom, Shader *shader, GLuint texture)
 	: GameObject(position, geom, shader, texture) {
 	
+	max_hitpoints_ = 14;
 	hitpoints_ = 14;
 	type_ = "Player";
 

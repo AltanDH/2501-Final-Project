@@ -13,6 +13,7 @@ GameObject::GameObject(const glm::vec3 &position, Geometry *geom, Shader *shader
     scale_ = glm::vec2(scaleX, scaleY);
     angle_ = 0.0;
     radius_ = 0.4f;
+    max_hitpoints_ = 1;
     hitpoints_ = 1;
     is_destroyed_ = false;
     is_invincible_ = false;

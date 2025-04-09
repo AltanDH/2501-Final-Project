@@ -65,7 +65,8 @@ void Game::SetupGameWorld(void)
            tex_stars = 14,
            tex_orb = 15,
            tex_empty = 16,
-           tex_bar = 17};
+           tex_bar = 17,
+           tex_font = 18};
     textures.push_back("/textures/player.png");
     textures.push_back("/textures/invincible.png");
     textures.push_back("/textures/mothership.png");
@@ -84,6 +85,7 @@ void Game::SetupGameWorld(void)
     textures.push_back("/textures/orb.png");
     textures.push_back("/textures/empty.png");
     textures.push_back("/textures/bar.png");
+    textures.push_back("/textures/font.png");
     // Load textures
     LoadTextures(textures);
 
@@ -106,21 +108,34 @@ void Game::SetupGameWorld(void)
 
     // **** Setup UI (note that their indexes will be maintained throughout the application)
     // Set up text quad
-    TextGameObject* time = new TextGameObject(glm::vec3(9.0f, 9.0f, -1.0f), sprite_, &text_shader_, tex_[tex_empty]);
+    TextGameObject* time = new TextGameObject(glm::vec3(9.0f, 9.0f, -1.0f), sprite_, &text_shader_, tex_[tex_font]);
     time->SetScale(glm::vec2(7.0, 1.0));
     time->SetText(std::to_string(current_time_));
     game_objects_.push_back(time); // index 2
 
     // Set up quad for shader drawing
-    DrawingGameObject* health_bar = new DrawingGameObject(glm::vec3(-12.0f, -8.5f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    DrawingGameObject* health_bar = new DrawingGameObject(glm::vec3(-6.0f, -9.0f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    health_bar->SetScale(glm::vec2(14.0, 1.0));
+    // Change value ratio to [0.0 - 1.0]
+    health_bar->SetFillValue(game_objects_[0]->GetHitpoints() / game_objects_[0]->GetMaxHitpoints());
+    health_bar->SetFillColor(glm::vec4(0.1f, 1.0f, 0.1f, 1.0f));
     game_objects_.push_back(health_bar); // index 3
 
     // Set up quad for shader drawing
-    DrawingGameObject* boss_bar = new DrawingGameObject(glm::vec3(-4.0f, 9.0f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    DrawingGameObject* boss_bar = new DrawingGameObject(glm::vec3(-2.0f, 9.0f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    boss_bar->SetScale(glm::vec2(15.0, 1.2));
+    // Change value ratio to [0.0 - 1.0]
+    boss_bar->SetFillValue(mothership->GetHitpoints() / mothership->GetMaxHitpoints());
+    boss_bar->SetFillColor(glm::vec4(1.0f, 0.1f, 0.1f, 1.0f));
     game_objects_.push_back(boss_bar); // index 4
 
     // Set up quad for shader drawing
-    DrawingGameObject* fuel_tank = new DrawingGameObject(glm::vec3(12.0f, -8.5f, -1.0f), sprite_, &drawing_shader_, tex_[tex_orb]);
+    DrawingGameObject* fuel_tank = new DrawingGameObject(glm::vec3(12.5f, -5.0f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    fuel_tank->SetScale(glm::vec2(10.0, 1.0));
+    fuel_tank->SetRotation(pi_over_two);
+    // Change value ratio to [0.0 - 1.0]
+    fuel_tank->SetFillValue(((PlayerGameObject*)game_objects_[0])->GetFuel()/100);
+    fuel_tank->SetFillColor(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
     game_objects_.push_back(fuel_tank); // index 5
 
     // Load boss area (place barries to encase player)
@@ -288,7 +303,9 @@ void Game::Update(double delta_time)
 {
     // Update UI display
     ((TextGameObject*)game_objects_[2])->SetText(std::to_string(current_time_));
-
+    ((DrawingGameObject*)game_objects_[3])->SetFillValue(game_objects_[0]->GetHitpoints() / game_objects_[0]->GetMaxHitpoints());
+    ((DrawingGameObject*)game_objects_[4])->SetFillValue(game_objects_[1]->GetHitpoints() / game_objects_[1]->GetMaxHitpoints());
+    ((DrawingGameObject*)game_objects_[5])->SetFillValue(((PlayerGameObject*)game_objects_[0])->GetFuel() / 100);
 
     // Spawns Collectibles when necessary (with internal checks)
     SpawnCollectible();

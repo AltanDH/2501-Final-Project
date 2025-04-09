@@ -27,7 +27,8 @@ namespace game {
             inline glm::vec2 GetScale(void) const { return scale_; }
             inline float GetRotation(void) const { return angle_; }
             inline float GetRadius(void) const { return radius_; }
-            inline int GetHitpoints(void) const { return hitpoints_; }
+            inline float GetMaxHitpoints(void) const { return max_hitpoints_; }
+            inline float GetHitpoints(void) const { return hitpoints_; }
             inline Timer& GetDmgCooldown(void) { return dmg_cooldown_; }
 
             // Getter to retrieve GameObject type (ex: "Player", "Collectible", "Enemy", etc..)
@@ -84,6 +85,7 @@ namespace game {
             float radius_;
 
             // Variables to track object destruction
+            int max_hitpoints_;
             int hitpoints_;
             bool is_destroyed_;
 
