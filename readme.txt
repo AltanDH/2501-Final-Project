@@ -27,9 +27,7 @@ Has a pulse which functions identically to the dreadnaut.
 ------------------
 -- Collectibles --
 ------------------
-One collectible replenishes hp by 2 points.
-Another replenishes fuel by 25 points.
-The third, when you collect 5 of them, you enter an invincible state for 10 seconds.
+
 
 ----------------------------------
 -- Movement and Transformations --
@@ -54,7 +52,7 @@ The game is tiled 100x100.
 ----------------------
 -- Particle Systems --
 ----------------------
-Particles occur when the boss is killed, and the player presses the boost button (spacebar).
+
 
 ---------------------------------------------------------------------
 -- Hierarchical Transformation of a Chain of at Least Three Linkes --

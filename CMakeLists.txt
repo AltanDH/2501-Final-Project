@@ -28,6 +28,8 @@ set(HDRS
 	geometry.h
 	sprite.h
 	timer.h
+	particles.h
+	particle_system.h
 )
  
 set(SRCS
@@ -53,6 +55,10 @@ set(SRCS
 	shader.cpp
 	sprite.cpp
 	timer.cpp
+	particles.cpp
+	particle_system.cpp
+	particle_vertex_shader.glsl
+	particle_fragment_shader.glsl
 	sprite_vertex_shader.glsl
 	sprite_fragment_shader.glsl
 )

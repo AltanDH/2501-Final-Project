@@ -174,6 +174,11 @@ namespace game {
 			// Apply it to the current position
 			position_ += velocity * (float)delta_time;
 		}
+
+		// If destroyed then set the texture to be empty (we have the particle system explosion effect instead)
+		if (is_destroyed_) {
+			texture_ = tex_[16];
+		}
 	}
 
 } // namespace game

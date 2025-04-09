@@ -18,6 +18,8 @@
 #include "fuel_collectible_object.h"
 #include "hierarchical_transformation.h"
 #include "projectile.h"
+#include "particles.h"
+#include "particle_system.h"
 
 
 namespace game {
@@ -117,7 +119,9 @@ void Game::SetupGameWorld(void)
     CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
     planet->SetScale(4.0f);
     celestial_objects_.push_back(planet);*/
+
     
+
     // Create a scale for the background texture coordinates enhancing
     float texture_coord_scale = 100.0f;
     // Make a new sprite allowing for the background tiling effect
@@ -125,12 +129,28 @@ void Game::SetupGameWorld(void)
     bckgrnd_sprite->CreateGeometry();
     
     // Setup background
-    GameObject *background = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), bckgrnd_sprite, &sprite_shader_, tex_[tex_stars]);
+    GameObject *background = new GameObject(glm::vec3(0.0f, 0.0f, 1.0f), bckgrnd_sprite, &sprite_shader_, tex_[tex_stars]);
     // Resize background to suit the new scale
     background->SetScale(12.0 * texture_coord_scale);
+    background->SetInvincible(true);
 
     // In this specific implementation, the background will always be the last object
     game_objects_.push_back(background);
+
+    // Setup particle system for Player boost
+    ParticleSystem* particles = new ParticleSystem(glm::vec3(-0.5f, 0.0f, 0.0f), particles_, &particle_shader_, tex_[tex_orb], game_objects_[0]);
+    particles->SetScale(0.2f);
+    particles->SetRotation(-pi_over_two);
+    particles->SetType("Booster");
+    // Provide it to the player
+    game_objects_.push_back(particles);
+
+    // Setup particle system for Player boost
+    ParticleSystem* pulse_particles = new ParticleSystem(glm::vec3(-0.5f, 0.0f, 0.0f), pulse_particles_, &particle_shader_, tex_[tex_orb], mothership);
+    pulse_particles->SetScale(0.2f);
+    pulse_particles->SetType("Explosion");
+    // Provide it to the player
+    game_objects_.push_back(pulse_particles);
 }
 
 
@@ -215,6 +235,20 @@ void Game::HandleControls(double delta_time)
             // Add it to game objects (we insert it right before the background to avoid collision detection issues)
             game_objects_.insert(game_objects_.end() - 1, pulse);
         }
+    }
+
+    // Trigger booster if requested
+    if (glfwGetKey(window_, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        // Allow player to use boost
+        if (player->GetFuel() > 0) {
+            player->AllowBoost(true);
+            player->SetMaxVelocity(16.0f);
+        }
+    }
+    // When space bar released, stop using boost
+    if (glfwGetKey(window_, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        player->AllowBoost(false);
+        player->SetMaxVelocity(8.0f);
     }
 
     // Close Window if requested by player
@@ -511,9 +545,9 @@ void Game::MainLoop(void)
     while (!glfwWindowShouldClose(window_)){
 
         // Calculate delta time
-        double current_time = glfwGetTime();
-        double delta_time = current_time - last_time;
-        last_time = current_time;
+        current_time_ = glfwGetTime();
+        double delta_time = current_time_ - last_time;
+        last_time = current_time_;
 
         // Update window events like input handling
         glfwPollEvents();
@@ -575,8 +609,21 @@ void Game::Init(void)
     sprite_ = new Sprite();
     sprite_->CreateGeometry();
 
+    // Initialize particle geometry
+    Particles* particles_temp = new Particles();
+    particles_temp->CreateGeometry(800); // Use 800 particles
+    particles_ = particles_temp;
+
+    // Initialize particle geometry for the shockwave/pulse weapon
+    Particles* particles_temp2 = new Particles();
+    particles_temp2->CreateGeometry(2500, 2.0f * glm::pi<float>());
+    pulse_particles_ = particles_temp2;
+
     // Initialize sprite shader
     sprite_shader_.Init((resources_directory_g+std::string("/sprite_vertex_shader.glsl")).c_str(), (resources_directory_g+std::string("/sprite_fragment_shader.glsl")).c_str());
+
+    // Initialize particle shader
+    particle_shader_.Init((resources_directory_g+std::string("/particle_vertex_shader.glsl")).c_str(), (resources_directory_g+std::string("/particle_fragment_shader.glsl")).c_str());
 
     // Initialize time
     current_time_ = 0.0;
@@ -594,6 +641,7 @@ Game::~Game()
 
     // Free rendering resources
     delete sprite_;
+    delete particles_;
 
     // Close window
     glfwDestroyWindow(window_);

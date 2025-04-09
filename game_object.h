@@ -54,6 +54,7 @@ namespace game {
             inline void SetScale(glm::vec2 scale) { scale_ = scale; }
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
+            inline void SetType(const std::string& type) { type_ = type; }
 
             void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }

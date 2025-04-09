@@ -46,8 +46,17 @@ namespace game {
             // Sprite geometry
             Geometry *sprite_;
 
+            // Particle geometry
+            Geometry *particles_;
+
+            // Pulse Particle geometry
+            Geometry* pulse_particles_;
+
             // Shader for rendering sprites in the scene
             Shader sprite_shader_;
+
+            // Shader for rendering particles
+            Shader particle_shader_;
 
             // References to textures
             // This needs to be a pointer
