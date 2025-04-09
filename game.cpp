@@ -135,8 +135,8 @@ void Game::SetupGameWorld(void)
     obj2->SetScale(glm::vec2(2.0f, 2.0f));
     obj3->SetScale(glm::vec2(2.0f, 2.0f));
     obj4->SetScale(glm::vec2(2.0f, 2.0f));
-    //HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, (Mothership*)game_objects_[1], glm::vec3(-3.0f, -3.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
-    //game_objects_.push_back(hier);
+    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, (Mothership*)game_objects_[1], glm::vec3(6.0f, 6.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
+    game_objects_.push_back(hier);
     game_objects_.push_back(obj1);
     game_objects_.push_back(obj2);
     game_objects_.push_back(obj3);

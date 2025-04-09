@@ -38,7 +38,8 @@ namespace game {
 		total_enemy_count_ = 0;
 
 		// Increase scale for grandeur
-		SetScale(3.0f);
+		SetScale(5.0f);
+		radius_ = 0.4 + (0.4 * scale_.x);
 	}
 
 	// Loads in the barriers for the boss area
