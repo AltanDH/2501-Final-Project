@@ -13,7 +13,7 @@ The player wins once the boss dies.
 -------------
 -- Enemies --
 -------------
-Boomer's try to chase the player and collide with them (boomers do extra damage).
+Boomer's try to chase the player and collide with them.
 Dreadnauts moves in parametric motion and releases a pulse around it which pushes any player and enemy entity.
 Fighter's attempt to kill the player by shooting them.
 
@@ -65,7 +65,7 @@ It just spins each sub-object in a circle to act as a spinning object which kill
 --------
 -- UI --
 --------
-
+We have health bars for the boss, player, and fuel, as well as a timer for how long the game has lasted.
 
 ---------------------
 -- Advanced Method --
