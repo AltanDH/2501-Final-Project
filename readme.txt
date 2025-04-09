@@ -61,6 +61,7 @@ Particles occur when the boss is killed, and the player presses the boost button
 ---------------------------------------------------------------------
 Created heirarchical transformation header and cpp which takes 4 game objects to create a heirarchical transformation object of 3 links.
 It just spins each sub-object in a circle to act as a spinning object which kills anything it touches.
+We used it as an object that kills any enemy or player object it collides with.
 
 --------
 -- UI --
