@@ -11,7 +11,7 @@ namespace game {
 
 		// Mothership specifics
 		type_ = "Mothership";
-		hitpoints_ = 30;
+		hitpoints_ = 15;
 
 		// Variables to define boss zone
 		width_ = 30;

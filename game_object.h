@@ -55,6 +55,7 @@ namespace game {
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
             inline void SetType(const std::string& type) { type_ = type; }
+            inline void SetRadius(float f) { radius_ = f;  }
 
             void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }

@@ -62,7 +62,8 @@ void Game::SetupGameWorld(void)
            tex_fuel_collectible = 13,
            tex_stars = 14,
            tex_orb = 15,
-           tex_empty = 16};
+           tex_empty = 16
+    };
     textures.push_back("/textures/player.png");
     textures.push_back("/textures/invincible.png");
     textures.push_back("/textures/mothership.png");
@@ -102,17 +103,21 @@ void Game::SetupGameWorld(void)
     // Load boss area (place barries to encase player)
     mothership->LoadBarriers();
 
-    /* HIERARCHICAL TRANSFORMATION
-    GameObject* obj1 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_boomer]);
-    GameObject* obj2 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player]);
-    GameObject* obj3 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_player]);
-    GameObject* obj4 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_fighter]);
-    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, glm::vec3(-30.0f, -30.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
+    // HIERARCHICAL TRANSFORMATION
+    GameObject* obj1 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_pulse]);
+    GameObject* obj2 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_pulse]);
+    GameObject* obj3 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_pulse]);
+    GameObject* obj4 = new GameObject(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_pulse]);
+    obj1->SetScale(glm::vec2(2.0f, 2.0f));
+    obj2->SetScale(glm::vec2(2.0f, 2.0f));
+    obj3->SetScale(glm::vec2(2.0f, 2.0f));
+    obj4->SetScale(glm::vec2(2.0f, 2.0f));
+    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, (Mothership*)game_objects_[1], glm::vec3(-3.0f, -3.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
     game_objects_.push_back(hier);
     game_objects_.push_back(obj1);
     game_objects_.push_back(obj2);
     game_objects_.push_back(obj3);
-    game_objects_.push_back(obj4);*/
+    game_objects_.push_back(obj4);
 
     /* Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)

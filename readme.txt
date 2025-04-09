@@ -60,8 +60,8 @@ Particles occur when the boss is killed, and the player presses the boost button
 -- Hierarchical Transformation of a Chain of at Least Three Linkes --
 ---------------------------------------------------------------------
 Created heirarchical transformation header and cpp which takes 4 game objects to create a heirarchical transformation object of 3 links.
-It just spins each sub-object in a circle to act as a spinning object which kills anything it touches.
-We used it as an object that kills any enemy or player object it collides with.
+It just spins each sub-object in a circle to act as a spinning object.
+We were going to use it as an obstacle which knocks players and enemies around but we never got around to it.
 
 --------
 -- UI --

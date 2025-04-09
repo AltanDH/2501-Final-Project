@@ -2,7 +2,7 @@
 #define HIERARCHICAL_TRANSFORMATION_H_
 
 #include "game_object.h"
-
+#include "mothership_boss.h"
 
 namespace game {
 	class HierarchicalTransformation : public GameObject { // Takes 4 game objects and creates a heirarchical transformation of 3 links for position and rotation
@@ -12,6 +12,7 @@ namespace game {
 			GameObject* obj2;
 			GameObject* obj3;
 			GameObject* obj4;
+			Mothership* boss;
 
 			// Distance between each "node" connecting transformations
 			float offset;
@@ -20,7 +21,7 @@ namespace game {
 			float angular_speed_;
 
 		public:
-			HierarchicalTransformation(GameObject* obj1, GameObject* obj2, GameObject* obj3, GameObject* obj4, const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture);
+			HierarchicalTransformation(GameObject* obj1, GameObject* obj2, GameObject* obj3, GameObject* obj4, Mothership* boss, const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture);
 			~HierarchicalTransformation();
 
 			void Collide(GameObject* other) override;
