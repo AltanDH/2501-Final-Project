@@ -30,6 +30,8 @@ set(HDRS
 	timer.h
 	particles.h
 	particle_system.h
+	drawing_game_object.h
+	text_game_object.h
 )
  
 set(SRCS
@@ -57,10 +59,14 @@ set(SRCS
 	timer.cpp
 	particles.cpp
 	particle_system.cpp
+	drawing_game_object.cpp
+	text_game_object.cpp
 	particle_vertex_shader.glsl
 	particle_fragment_shader.glsl
 	sprite_vertex_shader.glsl
 	sprite_fragment_shader.glsl
+	drawing_fragment_shader.glsl
+	text_fragment_shader.glsl
 )
 
 # Add path name to configuration file

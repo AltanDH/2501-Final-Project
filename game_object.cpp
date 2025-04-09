@@ -75,7 +75,7 @@ void GameObject::SetVelocity(const glm::vec3& velocity) {
 
 void GameObject::Collide(GameObject* other) {
     // Don't allow collisions with items that have special reactions (need to be handled in their own methods)
-    if (other->GetType() != "Collectible" && other->GetType() != "Pulse" && other->GetType() != "Projectile" && other->GetType() != "Barrier" && !is_invincible_) {
+    if (other->GetType() != "Collectible" && other->GetType() != "Pulse" && other->GetType() != "Projectile" && other->GetType() != "Barrier" && other->GetType() != "UI" && !is_invincible_) {
         // lower hitpoints
         hitpoints_--;
         // change state to 'destroyed' if necessary
@@ -92,7 +92,7 @@ void GameObject::Update(double delta_time) {
 }
 
 
-void GameObject::Render(glm::mat4 view_matrix, double current_time){
+void GameObject::Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixed, double current_time){
 
     // Set up the shader
     shader_->Enable();

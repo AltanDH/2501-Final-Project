@@ -55,7 +55,7 @@ namespace game {
             void SetRotation(float angle);
             inline void SetTexture(GLuint texture) { texture_ = texture; }
             inline void SetType(const std::string& type) { type_ = type; }
-            inline void SetRadius(float f) { radius_ = f;  }
+            inline void SetRadius(float f) { radius_ = f; }
 
             void SetHitpoints(int health);
             inline void SetDestroyed(bool destroyed) { is_destroyed_ = destroyed; }
@@ -71,7 +71,7 @@ namespace game {
             virtual void Update(double delta_time);
 
             // Renders the GameObject 
-            virtual void Render(glm::mat4 view_matrix, double current_time);
+            virtual void Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixed, double current_time);
 
 
         protected:

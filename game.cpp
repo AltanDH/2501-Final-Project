@@ -20,6 +20,8 @@
 #include "projectile.h"
 #include "particles.h"
 #include "particle_system.h"
+#include "drawing_game_object.h"
+#include "text_game_object.h"
 
 
 namespace game {
@@ -62,8 +64,8 @@ void Game::SetupGameWorld(void)
            tex_fuel_collectible = 13,
            tex_stars = 14,
            tex_orb = 15,
-           tex_empty = 16
-    };
+           tex_empty = 16,
+           tex_bar = 17};
     textures.push_back("/textures/player.png");
     textures.push_back("/textures/invincible.png");
     textures.push_back("/textures/mothership.png");
@@ -81,6 +83,7 @@ void Game::SetupGameWorld(void)
     textures.push_back("/textures/stars.png");
     textures.push_back("/textures/orb.png");
     textures.push_back("/textures/empty.png");
+    textures.push_back("/textures/bar.png");
     // Load textures
     LoadTextures(textures);
 
@@ -98,7 +101,27 @@ void Game::SetupGameWorld(void)
     Mothership* mothership = new Mothership(glm::vec3(0.0f, 0.0f, 0.0f), sprite_, &sprite_shader_, tex_, game_objects_[0]);
     mothership->SetGameObjectsRef(&game_objects_);
     mothership->SetRotation(pi_over_two);
-    game_objects_.push_back(mothership);
+    game_objects_.push_back(mothership); // index 1
+
+
+    // **** Setup UI (note that their indexes will be maintained throughout the application)
+    // Set up text quad
+    TextGameObject* time = new TextGameObject(glm::vec3(9.0f, 9.0f, -1.0f), sprite_, &text_shader_, tex_[tex_empty]);
+    time->SetScale(glm::vec2(7.0, 1.0));
+    time->SetText(std::to_string(current_time_));
+    game_objects_.push_back(time); // index 2
+
+    // Set up quad for shader drawing
+    DrawingGameObject* health_bar = new DrawingGameObject(glm::vec3(-12.0f, -8.5f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    game_objects_.push_back(health_bar); // index 3
+
+    // Set up quad for shader drawing
+    DrawingGameObject* boss_bar = new DrawingGameObject(glm::vec3(-4.0f, 9.0f, -1.0f), sprite_, &drawing_shader_, tex_[tex_bar]);
+    game_objects_.push_back(boss_bar); // index 4
+
+    // Set up quad for shader drawing
+    DrawingGameObject* fuel_tank = new DrawingGameObject(glm::vec3(12.0f, -8.5f, -1.0f), sprite_, &drawing_shader_, tex_[tex_orb]);
+    game_objects_.push_back(fuel_tank); // index 5
 
     // Load boss area (place barries to encase player)
     mothership->LoadBarriers();
@@ -112,20 +135,18 @@ void Game::SetupGameWorld(void)
     obj2->SetScale(glm::vec2(2.0f, 2.0f));
     obj3->SetScale(glm::vec2(2.0f, 2.0f));
     obj4->SetScale(glm::vec2(2.0f, 2.0f));
-    HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, (Mothership*)game_objects_[1], glm::vec3(-3.0f, -3.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
-    game_objects_.push_back(hier);
+    //HierarchicalTransformation* hier = new HierarchicalTransformation(obj1, obj2, obj3, obj4, (Mothership*)game_objects_[1], glm::vec3(-3.0f, -3.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_empty]);
+    //game_objects_.push_back(hier);
     game_objects_.push_back(obj1);
     game_objects_.push_back(obj2);
     game_objects_.push_back(obj3);
     game_objects_.push_back(obj4);
 
-    /* Spawn a Planet
+    // Spawn a Planet
     // Note the planet radius to scale ratio --> radius = 0.4 + (0.4 * scale)
-    CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], 2.0f);
+    CelestialBody* planet = new CelestialBody(glm::vec3(-7.0f, -7.0f, 0.0f), sprite_, &sprite_shader_, tex_[tex_orb], (Mothership*)game_objects_[1], 2.0f);
     planet->SetScale(4.0f);
-    celestial_objects_.push_back(planet);*/
-
-    
+    celestial_objects_.push_back(planet);
 
     // Create a scale for the background texture coordinates enhancing
     float texture_coord_scale = 100.0f;
@@ -151,11 +172,11 @@ void Game::SetupGameWorld(void)
     game_objects_.push_back(particles);
 
     // Setup particle system for Player boost
-    ParticleSystem* pulse_particles = new ParticleSystem(glm::vec3(-0.5f, 0.0f, 0.0f), pulse_particles_, &particle_shader_, tex_[tex_orb], mothership);
-    pulse_particles->SetScale(0.2f);
-    pulse_particles->SetType("Explosion");
+    ParticleSystem* explosion = new ParticleSystem(glm::vec3(-0.5f, 0.0f, 0.0f), explosion_particles_, &particle_shader_, tex_[tex_orb], mothership);
+    explosion->SetScale(0.2f);
+    explosion->SetType("Explosion");
     // Provide it to the player
-    game_objects_.push_back(pulse_particles);
+    game_objects_.push_back(explosion);
 }
 
 
@@ -265,6 +286,10 @@ void Game::HandleControls(double delta_time)
 
 void Game::Update(double delta_time)
 {
+    // Update UI display
+    ((TextGameObject*)game_objects_[2])->SetText(std::to_string(current_time_));
+
+
     // Spawns Collectibles when necessary (with internal checks)
     SpawnCollectible();
 
@@ -467,15 +492,16 @@ void Game::Render(void){
     glm::mat4 player_translation = glm::translate(glm::mat4(1.0f), -game_objects_[0]->GetPosition());
     // Form the view_matrix that will follow the player
     glm::mat4 view_matrix = window_scale_matrix * camera_zoom_matrix * player_translation;
+    glm::mat4 view_matrix_fixed = window_scale_matrix * camera_zoom_matrix;
 
     // Render all celestial objects
     for (int i = 0; i < celestial_objects_.size(); i++) {
-        celestial_objects_[i]->Render(view_matrix, current_time_);
+        celestial_objects_[i]->Render(view_matrix, view_matrix_fixed, current_time_);
     }
     
     // Render all game objects
     for (int i = 0; i < game_objects_.size(); i++) {
-        game_objects_[i]->Render(view_matrix, current_time_);
+        game_objects_[i]->Render(view_matrix, view_matrix_fixed, current_time_);
     }
 }
 
@@ -622,13 +648,19 @@ void Game::Init(void)
     // Initialize particle geometry for the shockwave/pulse weapon
     Particles* particles_temp2 = new Particles();
     particles_temp2->CreateGeometry(2500, 2.0f * glm::pi<float>());
-    pulse_particles_ = particles_temp2;
+    explosion_particles_ = particles_temp2;
 
     // Initialize sprite shader
     sprite_shader_.Init((resources_directory_g+std::string("/sprite_vertex_shader.glsl")).c_str(), (resources_directory_g+std::string("/sprite_fragment_shader.glsl")).c_str());
 
     // Initialize particle shader
     particle_shader_.Init((resources_directory_g+std::string("/particle_vertex_shader.glsl")).c_str(), (resources_directory_g+std::string("/particle_fragment_shader.glsl")).c_str());
+
+    // Initialize text shader
+    text_shader_.Init((resources_directory_g + std::string("/sprite_vertex_shader.glsl")).c_str(), (resources_directory_g + std::string("/text_fragment_shader.glsl")).c_str());
+
+    // Initialize drawing shader
+    drawing_shader_.Init((resources_directory_g + std::string("/sprite_vertex_shader.glsl")).c_str(), (resources_directory_g + std::string("/drawing_fragment_shader.glsl")).c_str());
 
     // Initialize time
     current_time_ = 0.0;

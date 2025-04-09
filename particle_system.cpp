@@ -26,7 +26,7 @@ void ParticleSystem::Update(double delta_time) {
 }
 
 
-void ParticleSystem::Render(glm::mat4 view_matrix, double current_time){
+void ParticleSystem::Render(glm::mat4 view_matrix, glm::mat4 view_matrix_fixed, double current_time){
 
     // If a player is loading the particle system (for a boost effect)
     if (parent_->GetType() == "Player" && type_ == "Booster") {

@@ -7,7 +7,7 @@
 namespace game {
 
     // Constructor
-    CelestialBody::CelestialBody(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, float radius)
+    CelestialBody::CelestialBody(const glm::vec3& position, Geometry* geom, Shader* shader, GLuint texture, Mothership* mothership, float radius)
         : GameObject(position, geom, shader, texture) {
 
         // Initialize member
@@ -15,6 +15,7 @@ namespace game {
 
         // Radius is an attribute of game object
         radius_ = radius;
+        mothership_ = mothership;
 
         type_ = "CelestialBody";
     }
@@ -164,4 +165,15 @@ namespace game {
 
     }
 
-}
+    // Override update method to make planet stay within boss range
+    void CelestialBody::Update(double delta_time) {
+
+        if (mothership_ != nullptr && !mothership_->isDestroyed()) {
+            // Calculate resulting velocity from Mothership
+            glm::vec3 velocity = glm::normalize(mothership_->GetDirection() * mothership_->GetSpeed());
+            // Apply it to the current position so Planet keeps following mothership
+            position_ += velocity * (float)delta_time;
+        }
+    }
+
+} // namespace game
