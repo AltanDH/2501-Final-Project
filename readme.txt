@@ -1,3 +1,9 @@
+Note that this project contains code from the COMP2501 demos: 
+
+Copyright (c) 2020-2025 Oliver van Kaick <Oliver.vanKaick@carleton.ca>, David Mould <mould@scs.carleton.ca>
+under the MIT License. 
+Refer to the "licenses.txt" file for more information.
+
 We developed the final project on Windows.
 
 Group members:
