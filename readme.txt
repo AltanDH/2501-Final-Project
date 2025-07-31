@@ -7,8 +7,8 @@ Refer to the "licenses.txt" file for more information.
 We developed the final project on Windows.
 
 Group members:
-	- Teddy Al Houwayek, 101316419
-	- Atan Dogan Hoca, 101311866
+	- Teddy Al Houwayek
+	- Atan Dogan Hoca
 	
 ---------------------
 ----- Controls ------
